@@ -1,0 +1,47 @@
+{
+    "name": "actengage/casey-jones",
+    "description": "The official package to communicate with Casey Jones.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Justin Kimbrell",
+            "email": "jkimbrell@actengage.com"
+        }
+    ],
+    "scripts": {
+        "test": "phpunit"
+    },
+    "require": {
+        "php": "^8.2",
+        "ext-redis": "*",
+        "laravel/framework": "^11.0",
+        "react/event-loop": "^1.5",
+        "react/promise": "^3.2"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0",
+        "phpunit/phpunit": "^10.0",
+        "laravel/pint": "^1.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Actengage\\CaseyJones\\": "src/",
+            "Tests\\": "tests/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4" : {
+            "Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Actengage\\CaseyJones\\ServiceProvider"
+            ],
+            "aliases": {
+                "Sanitize": "Actengage\\CaseyJones\\Facades\\Sanitize"
+            }
+        }
+    }
+}
