@@ -30,11 +30,11 @@ class StreamEventReceived
     /**
      * Remove this event from the Redis stream.
      *
-     * @return void
+     * @return int
      */
-    public function deleteFromStream()
+    public function deleteFromStream(): int
     {
-        app(Stream::class)->delete($this->app, $this->key);
+        return app(Stream::class)->delete($this->app, $this->key);
     }
 
     /**

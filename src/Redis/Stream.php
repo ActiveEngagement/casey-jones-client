@@ -18,7 +18,7 @@ class Stream
     }
 
     /**
-     * Dispatch an event to the redis stream.
+     * Add an event to the redis stream.
      *
      * @param StreamPayload $payload
      * @return string
