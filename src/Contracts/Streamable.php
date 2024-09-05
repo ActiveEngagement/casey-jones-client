@@ -14,9 +14,16 @@ interface Streamable
     public function payload(): StreamPayload;
 
     /**
-     * Dispatch the event to the Redis stream.
+     * Add the event to the Redis stream.
      *
      * @return void
      */
-    public function dispatchToStream(): void;
+    public function addToStream(): void;
+
+    // /**
+    //  * Delete the event from the Redis stream.
+    //  *
+    //  * @return void
+    //  */
+    // public function deleteFromStream(): void;
 }

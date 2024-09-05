@@ -3,7 +3,6 @@
 namespace Actengage\CaseyJones\Events;
 
 use Actengage\CaseyJones\Redis\Streamable;
-use Actengage\CaseyJones\Redis\StreamDispatcher;
 use Actengage\CaseyJones\Redis\StreamPayload;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;

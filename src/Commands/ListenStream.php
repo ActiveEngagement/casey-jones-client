@@ -36,6 +36,8 @@ class ListenStream extends Command
 
         $this->ensureRestartCommandIsRespected($loop);
 
+        $this->comment('Starting Casey Jones server...');
+
         $loop->addTimer($this->option('interval'), fn () => $this->loop($loop));
 
         $loop->run();
@@ -47,9 +49,16 @@ class ListenStream extends Command
             ->then(function(array $messages) {
                 foreach($messages as $key => $message) {
                     if($payload = Arr::get($message, 'payload')) {
-                        event(new StreamEventReceived($key, unserialize($payload)));
+                        event(new StreamEventReceived(
+                            app: $this->argument('app'),
+                            key: $key,
+                            payload: unserialize($payload)
+                        ));
                     }
                     
+                    $this->newLine();
+                    $this->line('Message Received: '.$key);
+                    $this->newLine();
                     $this->info(\json_encode($message));
                 }
             })
@@ -87,7 +96,8 @@ class ListenStream extends Command
                 return;
             }
 
-            $this->warn("Restart signal received.");
+            $this->newLine();
+            $this->comment("Restart signal received. Shutting down...");
 
             $loop->stop();
         });

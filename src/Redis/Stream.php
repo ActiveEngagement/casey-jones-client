@@ -4,7 +4,7 @@ namespace Actengage\CaseyJones\Redis;
 
 use Illuminate\Redis\Connections\Connection;
 
-class StreamDispatcher
+class Stream
 {
     /**
      * Construct the stream dispatch.
@@ -21,12 +21,24 @@ class StreamDispatcher
      * Dispatch an event to the redis stream.
      *
      * @param StreamPayload $payload
-     * @return void
+     * @return string
      */
-    public function dispatch(StreamPayload $payload): void
+    public function add(StreamPayload $payload): string
     {
-        $this->connection->xadd(
+        return $this->connection->xadd(
             $payload->token, $payload->id, $payload->toArray()
         );
+    }
+
+    /**
+     * Dispatch an event to the redis stream.
+     *
+     * @param string $token
+     * @param string|array<int,string> ...$keys
+     * @return int
+     */
+    public function delete(string $token, string|array ...$keys): int
+    {
+        return $this->connection->xdel($token, collect($keys)->flatten()->all());
     }
 }

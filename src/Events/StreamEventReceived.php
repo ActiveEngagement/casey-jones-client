@@ -3,6 +3,7 @@
 namespace Actengage\CaseyJones\Events;
 
 use Actengage\CaseyJones\Contracts\Streamable;
+use Actengage\CaseyJones\Redis\Stream;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -19,10 +20,21 @@ class StreamEventReceived
      * Create a new event instance.
      */
     public function __construct(
+        public readonly string $app,
         public readonly string $key,
         public readonly Streamable $payload
     ) {
         //
+    }
+
+    /**
+     * Remove this event from the Redis stream.
+     *
+     * @return void
+     */
+    public function deleteFromStream()
+    {
+        app(Stream::class)->delete($this->app, $this->key);
     }
 
     /**

@@ -3,17 +3,27 @@
 namespace Actengage\CaseyJones\Redis;
 
 use Actengage\CaseyJones\Contracts\Streamable as StreamableInterface;
-use Actengage\CaseyJones\Redis\StreamDispatcher;
+use Actengage\CaseyJones\Redis\Stream;
 
 abstract class Streamable implements StreamableInterface
 {
     /**
-     * Dispatch the event to the Redis stream.
+     * Add the event to the Redis stream.
      *
      * @return void
      */
-    public function dispatchToStream(): void
+    public function addToStream(): void
     {
-        app(StreamDispatcher::class)->dispatch($this->payload());
+        app(Stream::class)->add($this->payload());
     }
+
+    // /**
+    //  * Delete the event from the Redis stream.
+    //  *
+    //  * @return void
+    //  */
+    // public function deleteFromStream(): void
+    // {
+    //     app(Stream::class)->delete($this->payload()->key);
+    // }
 }
