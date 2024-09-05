@@ -3,7 +3,10 @@
 namespace Actengage\CaseyJones;
 
 use Actengage\CaseyJones\Commands\ListenStream;
+use Actengage\CaseyJones\Commands\TerminateStream;
+use Actengage\CaseyJones\Redis\StreamDispatcher;
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider
@@ -24,6 +27,14 @@ class ServiceProvider extends BaseServiceProvider
         });
 
         $this->app->alias(Client::class, 'casey.client');
+
+        $this->app->singleton(StreamDispatcher::class, function() {
+            return new StreamDispatcher(
+                Redis::connection(config('casey.redis.connection'))
+            );
+        });
+
+        $this->app->alias(StreamDispatcher::class, 'redis.streamer');
     }
 
     /**
@@ -40,9 +51,9 @@ class ServiceProvider extends BaseServiceProvider
         ]);
 
         if ($this->app->runningInConsole()) {
-
             $this->commands([
-                ListenStream::class
+                ListenStream::class,
+                TerminateStream::class
             ]);
         }
     }

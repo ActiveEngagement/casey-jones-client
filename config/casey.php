@@ -26,5 +26,20 @@ return [
     |
     */
 
-    'base_uri' => env('CASEY_BASE_URI', 'https://casey.actenage.com/api/')
+    'base_uri' => env('CASEY_BASE_URI', 'https://casey.actenage.com/api/'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redis Connection
+    |--------------------------------------------------------------------------
+    |
+    | This value is the name of the Redis connection to use when dispatching
+    | events to the stream. The possible values for this connection can be
+    | found in the config/database.php in the redis configuration.
+    |
+    */
+
+    'redis' => [
+        'connection' => env('CASEY_REDIS_CONNECTION', 'default')
+    ]
 ];
