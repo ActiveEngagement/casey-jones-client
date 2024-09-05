@@ -47,7 +47,7 @@ class ListenStream extends Command
             ->then(function(array $messages) {
                 foreach($messages as $key => $message) {
                     if($payload = Arr::get($message, 'payload')) {
-                        event(new StreamEventReceived(unserialize($payload)));
+                        event(new StreamEventReceived($key, unserialize($payload)));
                     }
                     
                     $this->info(\json_encode($message));

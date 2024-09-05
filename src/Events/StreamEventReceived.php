@@ -19,6 +19,7 @@ class StreamEventReceived
      * Create a new event instance.
      */
     public function __construct(
+        public readonly string $key,
         public readonly Streamable $payload
     ) {
         //
