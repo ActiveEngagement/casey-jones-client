@@ -40,6 +40,6 @@ return [
     */
 
     'redis' => [
-        'connection' => env('CASEY_REDIS_CONNECTION', 'default')
+        'connection' => env('CASEY_REDIS_CONNECTION', 'casey')
     ]
 ];

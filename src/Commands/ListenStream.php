@@ -8,6 +8,7 @@ use Illuminate\Redis\Connections\Connection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
+use InvalidArgumentException;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Promise\Promise;
@@ -16,8 +17,8 @@ use React\Promise\PromiseInterface;
 class ListenStream extends Command
 {
     protected $signature = 'casey:listen
-        {app : The name of the Casey Jones application}
-        {--connection : The Redis connection}
+        {--key= : The sha256 encoded token for the Casey Jones app}
+        {--connection= : The Redis connection}
         {--interval=1 : The timer interval (in seconds)}';
 
     protected $description = 'Listen to a Redis stream.';
@@ -26,8 +27,20 @@ class ListenStream extends Command
 
     protected string $lastId = '0-0';
 
+    protected ?string $app;
+
     public function handle()
     {
+        $this->app = $this->option('key') ?? $this->hashedApiKeyConfig();
+
+        if(!$this->app) {
+            throw new InvalidArgumentException(
+                'You must set an API Key in your .env file or pass it with the --key flag.'
+            );
+        }
+
+        $this->comment('Starting Casey Jones server...');
+
         $loop = Loop::get();
 
         $this->connection = Redis::connection(
@@ -35,8 +48,6 @@ class ListenStream extends Command
         );
 
         $this->ensureRestartCommandIsRespected($loop);
-
-        $this->comment('Starting Casey Jones server...');
 
         $loop->addTimer($this->option('interval'), fn () => $this->loop($loop));
 
@@ -50,7 +61,7 @@ class ListenStream extends Command
                 foreach($messages as $key => $message) {
                     if($payload = Arr::get($message, 'payload')) {
                         event(new StreamEventReceived(
-                            app: $this->argument('app'),
+                            app: $this->app,
                             key: $key,
                             payload: unserialize($payload)
                         ));
@@ -71,7 +82,7 @@ class ListenStream extends Command
     {
         return (new Promise(function($resolve, $reject) {
             $resolve($this->connection->xread([
-                $this->argument('app') => $this->lastId
+                $this->app => $this->lastId
             ], null));
         }))->then(function(array $groups) {
             if(is_array($messages = array_shift($groups))) {
@@ -101,5 +112,21 @@ class ListenStream extends Command
 
             $loop->stop();
         });
+    }
+
+    /**
+     * Get the sha256 hash of the api key from the config.
+     *
+     * @return string|null
+     */
+    protected function hashedApiKeyConfig(): ?string
+    {
+        if(!$key = config('casey.api_key')) {
+            return null;
+        }
+
+        [ , $key ] = explode('|', $key);
+
+        return hash('sha256', $key);
     }
 }

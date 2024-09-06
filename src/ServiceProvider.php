@@ -48,7 +48,7 @@ class ServiceProvider extends BaseServiceProvider
 
         $this->publishes([
             __DIR__.'/../config/casey.php' => config_path('casey.php'),
-        ]);
+        ], 'casey-config');
 
         if ($this->app->runningInConsole()) {
             $this->commands([
