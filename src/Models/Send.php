@@ -200,6 +200,19 @@ class Send extends Model
     }
 
     /**
+     * A scope restricted to sends that have been active for at least an hour.
+     * 
+     * @param Builder $query
+     * @return void
+     */
+    public function scopeActiveTooLong(Builder $query): void
+    {
+        $query
+            ->where('status', SendStatus::Active)
+            ->where('updated_at', '<=', now()->subHour());
+    }
+
+    /**
      * Detemines if the send is one of the given statuses.
      *
      * @param SendStatus ...$statuses

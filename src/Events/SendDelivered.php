@@ -2,7 +2,6 @@
 
 namespace Actengage\CaseyJones\Events;
 
-use Actengage\CaseyJones\Models\Send;
 use Actengage\CaseyJones\Redis\Streamable;
 use Actengage\CaseyJones\Redis\StreamPayload;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -20,7 +19,7 @@ class SendDelivered extends Streamable
      */
     public function __construct(
         public string $token,
-        public Send $send
+        public array $send
     ) {
         //
     }

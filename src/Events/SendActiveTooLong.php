@@ -4,18 +4,20 @@ namespace Actengage\CaseyJones\Events;
 
 use Actengage\CaseyJones\Redis\Streamable;
 use Actengage\CaseyJones\Redis\StreamPayload;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class SendFailed extends Streamable
+class SendActiveTooLong extends Streamable
 {
+    use Dispatchable, SerializesModels;
+
     /**
      * Create a new event instance.
-     *
-     * @return void
      */
     public function __construct(
         public string $token,
@@ -33,7 +35,7 @@ class SendFailed extends Streamable
     {
         return new StreamPayload(
             token: $this->token,
-            name: 'send.failed',
+            name: 'send.active-too-long',
             payload: serialize($this)
         );
     }
