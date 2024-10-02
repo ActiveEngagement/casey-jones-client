@@ -2,6 +2,7 @@
 
 namespace Actengage\CaseyJones\Enums;
 
+/** @typescript */
 enum SendStatus: string
 {
     case Draft = 'draft';

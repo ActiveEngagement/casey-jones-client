@@ -7,7 +7,6 @@ use Actengage\CaseyJones\Concerns\InteractsWithGuzzleClient;
 use Actengage\CaseyJones\Concerns\InteractsWithResponses;
 use Actengage\CaseyJones\Resources\InstanceResource;
 use GuzzleHttp\Client as HttpClient;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * The official Casey Jones REST client.
@@ -50,8 +49,7 @@ class Client
     /**
      * Search for sends API resource.
      *
-     * @param array|null $query
-     * @return LengthAwarePaginator
+     * @return SendResource
      */
     public function sends(): SendResource
     {
@@ -59,7 +57,7 @@ class Client
     }
 
     /**
-     * Create and set an HTTP client.
+     * Create a new HttpClient with the given access token.
      *
      * @param string $key
      * @return HttpClient

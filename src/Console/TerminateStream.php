@@ -1,22 +1,37 @@
 <?php
 
-namespace Actengage\CaseyJones\Commands;
+namespace Actengage\CaseyJones\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Redis\Connections\Connection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\InteractsWithTime;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'casey:restart')]
 class TerminateStream extends Command
 {
     use InteractsWithTime;
 
-    protected $signature = 'casey:restart';
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $command = 'casey:restart';
 
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
     protected $description = 'Restart all Casey Jones listeners.';
 
-    protected Connection $connection;
-
+    /**
+     * Execute the console command.
+     *
+     * @return bool|null
+     */
     public function handle()
     {
         Cache::forever('casey:restart', $this->currentTime());

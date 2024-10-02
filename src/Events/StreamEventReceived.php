@@ -14,13 +14,13 @@ use Illuminate\Queue\SerializesModels;
 
 class StreamEventReceived
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, SerializesModels;
 
     /**
      * Create a new event instance.
      */
     public function __construct(
-        public readonly string $app,
+        public readonly string $token,
         public readonly string $key,
         public readonly Streamable $payload
     ) {
@@ -34,7 +34,7 @@ class StreamEventReceived
      */
     public function deleteFromStream(): int
     {
-        return app(Stream::class)->delete($this->app, $this->key);
+        return app(Stream::class)->delete($this->token, $this->key);
     }
 
     /**

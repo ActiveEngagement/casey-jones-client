@@ -16,17 +16,19 @@
         "ext-redis": "*",
         "laravel/framework": "^11.0",
         "react/event-loop": "^1.5",
-        "react/promise": "^3.2"
+        "react/promise": "^3.2",
+        "spatie/laravel-data": "^4.9",
+        "actengage/laravel-message-gears": "^1.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^9.0",
-        "phpunit/phpunit": "^10.0",
-        "laravel/pint": "^1.8"
+        "orchestra/testbench": "^9.5",
+        "laravel/pint": "^1.8",
+        "pestphp/pest": "^3.2",
+        "pestphp/pest-plugin-laravel": "^3.0"
     },
     "autoload": {
         "psr-4": {
-            "Actengage\\CaseyJones\\": "src/",
-            "Tests\\": "tests/"
+            "Actengage\\CaseyJones\\": "src/"
         }
     },
     "autoload-dev": {
@@ -40,8 +42,14 @@
                 "Actengage\\CaseyJones\\ServiceProvider"
             ],
             "aliases": {
-                "Sanitize": "Actengage\\CaseyJones\\Facades\\Sanitize"
+                "Client": "Actengage\\CaseyJones\\Facades\\Client",
+                "MessageGears": "Actengage\\CaseyJones\\Facades\\MessageGears"
             }
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
         }
     }
 }
