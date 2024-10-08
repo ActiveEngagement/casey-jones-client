@@ -13,7 +13,7 @@ class MessageGearsMarketingCampaignJobStatusData extends Data implements Mockabl
     public function __construct(
         public int $id,
         public string $subjectLine,
-        public bool $error = false,
+        public ?bool $error = false,
         public ?string $errorMessage = null,
         public MessageGearsJobStatus $jobStatus,
         public ?MessageGearsJobActivityStatus $jobActivityStatus = null,

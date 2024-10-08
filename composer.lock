@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d920fcae5f926f7b9c17c5806bae5179",
+    "content-hash": "90927056c40c88d2a62159d2ea4b65bd",
     "packages": [
         {
             "name": "actengage/laravel-message-gears",

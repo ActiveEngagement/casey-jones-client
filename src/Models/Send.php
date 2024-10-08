@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Send extends Model
@@ -61,6 +62,16 @@ class Send extends Model
             'failed_at' => 'datetime',
             'delivered_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Get the jobs for the send.
+     *
+     * @return HasMany
+     */
+    public function jobs(): HasMany
+    {
+        return $this->hasMany(SendJob::class);
     }
 
     /**
@@ -245,6 +256,9 @@ class Send extends Model
         static::saving(function(Send $model) {
             if($model->status === SendStatus::Draft) {
                 $model->scheduled_at = null;
+            }
+            else if($model->status === SendStatus::Scheduled) {
+                $model->failed_at = null;
             }
         });
     }

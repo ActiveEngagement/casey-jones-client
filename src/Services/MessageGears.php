@@ -2,6 +2,7 @@
 
 namespace Actengage\CaseyJones\Services;
 
+use Actengage\CaseyJones\Data\MessageGearsAudienceData;
 use Actengage\CaseyJones\Data\MessageGearsMarketingCampaignJobStatusData;
 use Actengage\CaseyJones\Data\MessageGearsMarketingCampaignData;
 use Actengage\CaseyJones\Data\MessageGearsMarketingCampaignNewJobData;
@@ -67,7 +68,7 @@ class MessageGears
      */
     public function createMarketingCampaignJob(int $campaign_id): MessageGearsMarketingCampaignNewJobData
     {
-        $response = $this->accelerator->patch([
+        $response = $this->accelerator->post([
             'campaign/marketing/%d/job', $campaign_id
         ]);
 
@@ -206,7 +207,7 @@ class MessageGears
      * Get a marketing campaign.
      *
      * @param integer $campaign_id
-     * @return MessageGearsCampaignData
+     * @return MessageGearsMarketingCampaignData
      * @throws \GuzzleHttp\Exception\ClientException
      * @throws \GuzzleHttp\Exception\ServerException
      */
@@ -237,5 +238,20 @@ class MessageGears
         ]);
 
         return MessageGearsMarketingCampaignData::from(json_decode($response->getBody()));
+    }
+
+    /**
+     * Get an audience.
+     *
+     * @param integer $audience_id
+     * @return MessageGearsAudienceData
+     * @throws \GuzzleHttp\Exception\ClientException
+     * @throws \GuzzleHttp\Exception\ServerException
+     */
+    public function getAudience(int $audience_id): MessageGearsAudienceData
+    {
+        $response = $this->accelerator->get(['audience/query/%s', $audience_id]);
+
+        return MessageGearsAudienceData::from(json_decode($response->getBody()));
     }
 }

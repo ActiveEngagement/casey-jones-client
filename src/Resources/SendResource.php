@@ -89,4 +89,30 @@ class SendResource
         );
     }
 
+    /**
+     * Show the specified resource.
+     *
+     * @param int $id
+     * @return array
+     */
+    public function audience(int $id): array
+    {
+        $response = $this->client->get(sprintf('sends/%s/audience', $id));
+
+        return $this->decode($response);
+    }
+
+    /**
+     * Show the specified resource.
+     *
+     * @param int $id
+     * @return array
+     */
+    public function campaign(int $id): array
+    {
+        $response = $this->client->get(sprintf('sends/%s/campaign', $id));
+
+        return $this->decode($response);
+    }
+
 }

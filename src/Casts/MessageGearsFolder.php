@@ -35,6 +35,13 @@ class MessageGearsFolder implements CastsAttributes
             return null;
         }
 
+        if(is_array($value)) {
+            $value = MessageGearsFolderData::from($value);
+        }
+        else if(is_string($value)) {
+            $value = MessageGearsFolderData::from(json_decode($value, true));
+        }
+
         return $value->toJson();
     }
 }

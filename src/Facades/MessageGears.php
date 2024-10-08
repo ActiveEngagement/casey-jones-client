@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \GuzzleHttp\Psr7\Response deleteTemplate(int $template_id)
  * @method static \Actengage\CaseyJones\Data\MessageGearsMarketingCampaignData getMarketingCampaign(int $campaign_id)
  * @method static \Actengage\CaseyJones\Data\MessageGearsMarketingCampaignData updateMarketingCampaign(int $campaign_id, array $attributes)
+ * @method static \Actengage\CaseyJones\Data\MessageGearsAudienceData getAudience(int $audience_id)
  */
 class MessageGears extends Facade
 {

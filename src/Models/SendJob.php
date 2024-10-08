@@ -2,12 +2,15 @@
 
 namespace Actengage\CaseyJones\Models;
 
+use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Database\Eloquent\BroadcastsEvents;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
+use Throwable;
 
 class SendJob extends Model
 {
@@ -88,6 +91,45 @@ class SendJob extends Model
     public function scopeMailingid(Builder $query, int $mailingid): void
     {
         $query->where('mailingid', $mailingid);
+    }
+
+    /**
+     * Get the channels that model events should broadcast on.
+     *
+     * @return array<int, \Illuminate\Broadcasting\Channel|\Illuminate\Database\Eloquent\Model>
+     */
+    public function broadcastOn(string $event): array
+    {
+        return [$this, $this->send];
+    }
+
+    /**
+     * Mark the job as failed.
+     *
+     * @param Throwable $e
+     * @return void
+     */
+    public function fail(Throwable $e): void
+    {
+        $this->fill([
+            'failed' => true,
+            'mailingid' => $this->send->mailingid
+        ]);
+        
+        if($e instanceof BadResponseException) {
+            $response = json_decode($e->getResponse()->getBody(), true);
+
+            $this->update([
+                'response' => $response,
+                'status_code' => $e->getResponse()->getStatusCode(),
+                'error_message' => Arr::get($response, 'errorMessage', $e->getMessage()),
+            ]);
+        }
+        else {
+            $this->update([
+                'error_message' => $e->getMessage()
+            ]);
+        }
     }
 
     /**

@@ -86,6 +86,9 @@ class ListenStream extends Command implements PromptsForMissingInput
             ->then(function(array $messages) use ($token) {
                 foreach($messages as $key => $message) {
                     if($payload = Arr::get($message, 'payload')) {
+                        $event = unserialize($payload);
+                        $event->key = $key;
+
                         event(new StreamEventReceived(
                             token: $token,
                             key: $key,

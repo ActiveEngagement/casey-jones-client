@@ -21,8 +21,10 @@ class MessageGearsTemplateData extends Data implements Mockable
         public ?string $fromAddress,
         public ?string $replyToAddress,
         public MessageGearsFolderData $folder,
+        /** @var MessageGearsSampleRecipientData[] */
         #[DataCollectionOf(MessageGearsSampleRecipientData::class)]
         public ?array $sampleRecipients,
+        /** @var MessageGearsSampleRecipientData[] */
         #[DataCollectionOf(MessageGearsTemplateLibraryData::class)]
         public ?array $templateLibraries,
         public bool $locked,

@@ -8,6 +8,13 @@ use Actengage\CaseyJones\Redis\Stream;
 abstract class Streamable implements StreamableInterface
 {
     /**
+     * The redis stream key.
+     *
+     * @var string|null
+     */
+    public ?string $key = null;
+
+    /**
      * Add the event to the Redis stream.
      *
      * @return void

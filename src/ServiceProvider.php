@@ -5,8 +5,11 @@ namespace Actengage\CaseyJones;
 use Actengage\CaseyJones\Console\ListenStream;
 use Actengage\CaseyJones\Console\MakeListener;
 use Actengage\CaseyJones\Console\TerminateStream;
+use Actengage\CaseyJones\Events\Dispatcher;
 use Actengage\CaseyJones\Redis\Stream;
 use Actengage\CaseyJones\Services\MessageGears;
+use Illuminate\Contracts\Queue\Factory as QueueFactoryContract;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
@@ -49,6 +52,16 @@ class ServiceProvider extends BaseServiceProvider
         });
 
         $this->app->alias(MessageGears::class, 'casey.mg');
+        
+        // Register the event listener
+
+        $this->app->singleton(Dispatcher::class, function(Application $app) {
+            return (new Dispatcher($app))->setQueueResolver(function () use ($app) {
+                return $app->make(QueueFactoryContract::class);
+            });
+        });
+
+        $this->app->alias(Dispatcher::class, 'casey.events');
     }
 
     /**
