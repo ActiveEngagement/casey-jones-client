@@ -1,11 +1,11 @@
-name: Deploy to Production 🚀
+name: Release to Master 🚀
 
 on:
   push:
     branches: ["master"]
 
 jobs:
-  production:
+  beta:
 
     runs-on: ubuntu-latest
     
@@ -24,11 +24,9 @@ jobs:
     - name: Prepare Laravel Application
       run: |
         touch database/database.sqlite
-        cp .env.ci .env
-        php artisan key:generate
 
     - name: Run PHPUnit Tests 🧪
-      run: php artisan test
+      run: vendor/bin/pest
 
     - name: Install PNPM 📚
       uses: pnpm/action-setup@v2
@@ -36,10 +34,10 @@ jobs:
       with:
         version: 7
 
-    - name: Use Node.js 18.x 🟢
+    - name: Use Node.js 20.x 🟢
       uses: actions/setup-node@v3
       with:
-        node-version: 18.x
+        node-version: 20.x
 
     - name: PNPM dependencies
       run: pnpm install --no-frozen-lockfile
@@ -47,14 +45,9 @@ jobs:
     - name: Semantic Release 🚀
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       id: semantic
       run: |
         output=$(npx semantic-release)
         echo "$output"
         new_sha=$(echo "$output" | grep -oP 'Created tag \K[^ ]+' | xargs git rev-parse)
         echo "NEW_SHA=$new_sha" >> $GITHUB_OUTPUT
-
-    - name: Trigger Deployment
-      run: |
-        curl -X POST https://envoyer.io/deploy/gGdHoQ7Hu6ouzNcwU6iGUSbD1eymrLAWkh5JuNP3?sha=${{ steps.semantic.outputs.NEW_SHA }}

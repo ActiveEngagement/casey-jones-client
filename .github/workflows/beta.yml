@@ -1,4 +1,4 @@
-name: Deploy to Beta 🚀
+name: Release to Beta 🚀
 
 on:
   push:
