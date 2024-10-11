@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('send_jobs', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid');
+            $table->index('uuid');
             $table->bigInteger('send_id')->unsigned();
             $table->foreign('send_id')->references('id')->on('sends')->cascadeOnDelete()->cascadeOnUpdate();
             $table->integer('status_code')->nullable();

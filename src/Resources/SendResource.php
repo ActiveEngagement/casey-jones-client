@@ -50,10 +50,10 @@ class SendResource
     /**
      * Show the specified resource.
      *
-     * @param int $id
+     * @param string $id
      * @return array
      */
-    public function show(int $id): array
+    public function show(string $id): array
     {
         $response = $this->client->get(sprintf('sends/%s', $id));
 
@@ -63,11 +63,11 @@ class SendResource
     /**
      * Update the specified resource.
      *
-     * @param int $id
+     * @param string $id
      * @param array $attributes
      * @return array
      */
-    public function update(int $id, array $attributes): array
+    public function update(string $id, array $attributes): array
     {
         $response = $this->client->put(sprintf('sends/%s', $id), [
             'form_params' => $attributes
@@ -79,10 +79,10 @@ class SendResource
     /**
      * Delete the specified resource.
      *
-     * @param int $id
+     * @param string $id
      * @return array
      */
-    public function delete(int $id): array
+    public function delete(string $id): array
     {
         return $this->decode(
             $this->client->delete(sprintf('sends/%s', $id))
@@ -92,10 +92,10 @@ class SendResource
     /**
      * Show the specified resource.
      *
-     * @param int $id
+     * @param string $id
      * @return array
      */
-    public function audience(int $id): array
+    public function audience(string $id): array
     {
         $response = $this->client->get(sprintf('sends/%s/audience', $id));
 
@@ -105,10 +105,10 @@ class SendResource
     /**
      * Show the specified resource.
      *
-     * @param int $id
+     * @param string $id
      * @return array
      */
-    public function campaign(int $id): array
+    public function campaign(string $id): array
     {
         $response = $this->client->get(sprintf('sends/%s/campaign', $id));
 

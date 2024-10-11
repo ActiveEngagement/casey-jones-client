@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('sends', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid');
+            $table->index('uuid');
             $table->bigInteger('app_id')->unsigned();
             $table->bigInteger('instance_id')->unsigned();
             $table->integer('campaign_id')->unsigned();

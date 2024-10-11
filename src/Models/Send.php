@@ -9,6 +9,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Database\Eloquent\BroadcastsEvents;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Send extends Model
 {
-    use BroadcastsEvents, HasFactory, SoftDeletes;
+    use BroadcastsEvents, HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
         'app_id',
@@ -249,10 +250,8 @@ class Send extends Model
      *
      * @return void
      */
-    public static function boot(): void
+    public static function booted(): void
     {
-        parent::boot();
-
         static::saving(function(Send $model) {
             if($model->status === SendStatus::Draft) {
                 $model->scheduled_at = null;

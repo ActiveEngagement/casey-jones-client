@@ -5,6 +5,7 @@ namespace Actengage\CaseyJones\Models;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Database\Eloquent\BroadcastsEvents;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,7 +15,7 @@ use Throwable;
 
 class SendJob extends Model
 {
-    use BroadcastsEvents, HasFactory, SoftDeletes;
+    use BroadcastsEvents, HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
         'status_code',
@@ -137,10 +138,8 @@ class SendJob extends Model
      *
      * @return void
      */
-    public static function boot(): void
+    public static function booted(): void
     {
-        parent::boot();
-
         static::saving(function(SendJob $model) {
             if($model->failed === null && $model->status_code) {
                 $model->failed = !($model->status_code >= 200 && $model->status_code < 300);
