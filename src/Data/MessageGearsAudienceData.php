@@ -9,7 +9,7 @@ use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-/** @typescript */
+/** @typescript MessageGearsAudience */
 class MessageGearsAudienceData extends Data implements Mockable
 {
     public function __construct(

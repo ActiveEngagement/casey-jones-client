@@ -5,7 +5,7 @@ namespace Actengage\CaseyJones\Data;
 use Actengage\CaseyJones\Enums\SendStatus;
 use Spatie\LaravelData\Data;
 
-/** @typescript */
+/** @typescript Send */
 class SendData extends Data
 {
     public function __construct(

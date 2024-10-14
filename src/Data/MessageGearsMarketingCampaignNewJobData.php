@@ -6,7 +6,7 @@ use Actengage\CaseyJones\Contracts\Mockable;
 use Actengage\CaseyJones\Enums\MessageGearsJobStatus;
 use Spatie\LaravelData\Data;
 
-/** @typescript */
+/** @typescript MessageGearsMarketingCampaignNewJob */
 class MessageGearsMarketingCampaignNewJobData extends Data implements Mockable
 {
     public function __construct(

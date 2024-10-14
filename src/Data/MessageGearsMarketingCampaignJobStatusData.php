@@ -7,7 +7,7 @@ use Actengage\CaseyJones\Enums\MessageGearsJobActivityStatus;
 use Actengage\CaseyJones\Enums\MessageGearsJobStatus;
 use Spatie\LaravelData\Data;
 
-/** @typescript */
+/** @typescript MessageGearsMarketingCampaignJobStatus */
 class MessageGearsMarketingCampaignJobStatusData extends Data implements Mockable
 {
     public function __construct(

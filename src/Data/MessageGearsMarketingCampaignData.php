@@ -5,7 +5,7 @@ namespace Actengage\CaseyJones\Data;
 use Actengage\CaseyJones\Contracts\Mockable;
 use Spatie\LaravelData\Data;
 
-/** @typescript */
+/** @typescript MessageGearsMarketingCampaign */
 class MessageGearsMarketingCampaignData extends Data implements Mockable
 {
     public function __construct(

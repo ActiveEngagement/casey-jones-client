@@ -4,7 +4,7 @@ namespace Actengage\CaseyJones\Data;
 
 use Spatie\LaravelData\Data;
 
-/** @typescript */
+/** @typescript SendJob */
 class SendJobData extends Data
 {
     public function __construct(
