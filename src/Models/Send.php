@@ -44,7 +44,7 @@ class Send extends Model
 
     protected $attributes = [
         'meta' => '{}',
-        'data_variables' => '[]'
+        'data_variables' => '{}'
     ];
     
     /**

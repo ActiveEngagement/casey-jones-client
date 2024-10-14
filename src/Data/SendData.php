@@ -24,6 +24,10 @@ class SendData extends Data
 		public string $reply_to_address,
 		public string $reply_to_name,
 		public int $mailingid,
+		/** @var Record<string,any> */
+		public array $meta = [],
+		/** @var Record<string,string> */
+		public array $data_variables = [],
 		public ?string $scheduled_at = null,
 		public ?string $delivered_at = null,
 		public ?string $failed_at = null,
