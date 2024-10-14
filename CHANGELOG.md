@@ -1,3 +1,10 @@
+# [1.0.0-beta.2](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2024-10-14)
+
+
+### Bug Fixes
+
+* updated typescript transform definitions ([6d4f917](https://github.com/ActiveEngagement/casey-jones-client/commit/6d4f917a780b25c8f3b7484eac0fff4a9d324b77))
+
 # 1.0.0-beta.1 (2024-10-11)
 
 
