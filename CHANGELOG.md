@@ -1,3 +1,10 @@
+# [1.0.0-beta.3](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2024-10-14)
+
+
+### Bug Fixes
+
+* updated typescript definitions and default attribute value for data_variables ([8ea78dd](https://github.com/ActiveEngagement/casey-jones-client/commit/8ea78dd16a8161ffdf599d31019c48c67089746e))
+
 # [1.0.0-beta.2](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2024-10-14)
 
 
