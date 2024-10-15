@@ -42,7 +42,7 @@ it('gets a send', function() {
         new Response(200, [], json_encode(SendData::mock()))
     ]);
 
-    $response = Client::sends()->show(1);
+    $response = Client::sends()->show(str()->uuid());
 
     expect($response)->toBeInstanceOf(SendData::class);
 });

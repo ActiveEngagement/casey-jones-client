@@ -10,20 +10,20 @@ use Spatie\LaravelData\Data;
 class SendData extends Data implements Mockable
 {
     public function __construct(
-		public int $id,
+		public string $id,
 		public int $app_id,
 		public int $instance_id,
 		public int $campaign_id,
 		public string $name,
-		public SendStatus $status,
-		public string $subject,
-		public string $html,
-		public string $text,
-		public MessageGearsFolderData $folder,
-		public string $from_address,
-		public string $from_name,
-		public string $reply_to_address,
-		public string $reply_to_name,
+		public ?SendStatus $status = SendStatus::Draft,
+		public ?string $subject = null,
+		public ?string $html = null,
+		public ?string $text = null,
+		public ?MessageGearsFolderData $folder = null,
+		public ?string $from_address = null,
+		public ?string $from_name = null,
+		public ?string $reply_to_address = null,
+		public ?string $reply_to_name = null,
 		/** @var Record<string,any> */
 		public array $meta = [],
 		/** @var Record<string,string> */
@@ -48,7 +48,7 @@ class SendData extends Data implements Mockable
     public static function mock(array $attributes = []): static
     {
         return static::from(array_merge([
-            'id' => 1,
+            'id' => str()->uuid(),
 			'app_id' => 1,
 			'instance_id' => 1,
 			'campaign_id' => 1,

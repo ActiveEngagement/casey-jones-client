@@ -12,7 +12,7 @@ class SendCampaignResource
     
     public function __construct(
         protected readonly Client $client,
-        protected readonly int $send_id
+        protected readonly string $send_id
     ) {
         //
     }

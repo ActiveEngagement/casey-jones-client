@@ -95,10 +95,10 @@ class SendResource
     /**
      * Get the send audience resource.
      *
-     * @param int $send_id
+     * @param string $send_id
      * @return \Actengage\CaseyJones\Resources\SendAudienceResource
      */
-    public function audience(int $send_id): SendAudienceResource
+    public function audience(string $send_id): SendAudienceResource
     {
         return new SendAudienceResource(
             client: $this->client,
