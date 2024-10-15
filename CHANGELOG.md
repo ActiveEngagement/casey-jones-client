@@ -1,3 +1,10 @@
+# [1.0.0-beta.4](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2024-10-15)
+
+
+### Bug Fixes
+
+* improved api consistency with better resources and return types ([14e213f](https://github.com/ActiveEngagement/casey-jones-client/commit/14e213f299150010d5c0c6b87c303a50b2a9332c))
+
 # [1.0.0-beta.3](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2024-10-14)
 
 
