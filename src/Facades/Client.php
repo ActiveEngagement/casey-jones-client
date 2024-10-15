@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Actengage\CaseyJones\Resources\InstanceResource instances()
  * @method static \Actengage\CaseyJones\Resources\SendResource sends()
  * @method static void personalAccessToken(string $key)
- * @method static void personalAccessToken(string $key)
  * @method static void mock(\GuzzleHttp\Handler\MockHandler|array $handler)
  */
 class Client extends Facade
