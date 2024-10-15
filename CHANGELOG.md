@@ -1,3 +1,10 @@
+# [1.0.0-beta.5](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.4...v1.0.0-beta.5) (2024-10-15)
+
+
+### Bug Fixes
+
+* fixed issue with send resources using ids and send data requiring too much data ([b31d5a5](https://github.com/ActiveEngagement/casey-jones-client/commit/b31d5a596ebab0d177db114c92a83245f4cde16c))
+
 # [1.0.0-beta.4](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2024-10-15)
 
 
