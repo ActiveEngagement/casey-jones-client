@@ -59,16 +59,16 @@ class Client
     /**
      * Create a new HttpClient with the given access token.
      *
-     * @param string $key
+     * @param ?string $key
      * @return HttpClient
      */
-    public static function personalAccessToken(string $key): void
+    public static function personalAccessToken(?string $key): void
     {
         static::client(new HttpClient([
             'base_uri' => config('casey.base_uri'),
             'headers' => [
                 'Accept' => 'application/json',
-                'Authorization' => sprintf('Bearer %s', $key)
+                'Authorization' => $key ? sprintf('Bearer %s', $key): null
             ]
         ]));
     }

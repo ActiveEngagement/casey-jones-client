@@ -15,6 +15,9 @@ use Actengage\CaseyJones\Exceptions\JobIsCurrentlyBeingCollected;
 use Actengage\MessageGears\Accelerator;
 use Actengage\MessageGears\Cloud;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class MessageGears
 {
@@ -136,6 +139,30 @@ class MessageGears
     }
 
     /**
+     * Get a list of template.
+     *
+     * @param integer $page
+     * @param integer $limit
+     * @return \Illuminate\Pagination\LengthAwarePaginator<\Actengage\CaseyJones\Data\MessageGearsTemplateData>
+     * @throws \GuzzleHttp\Exception\ServerException
+     */
+    public function getTemplates(int $page = 1, int $limit = 50): LengthAwarePaginator
+    {
+        $response = $this->accelerator->get('template', [
+            'query' => [
+                'page' => max(0, $page - 1),
+                'size' => $limit
+            ]
+        ]);
+        
+        $data = json_decode($response->getBody());
+
+        return (new LengthAwarePaginator(
+            $data->content, $data->totalElements, $data->size, $page
+        ))->through(fn (object $data) => MessageGearsTemplateData::from($data));
+    }
+
+    /**
      * Get a template.
      *
      * @param integer $template_id
@@ -161,7 +188,7 @@ class MessageGears
      */
     public function createTemplate(array $attributes): MessageGearsTemplateData
     {
-        $response = $this->accelerator->post('template/', [
+        $response = $this->accelerator->post('template', [
             'json' => $attributes
         ]);
 
@@ -253,5 +280,97 @@ class MessageGears
         $response = $this->accelerator->get(['audience/query/%s', $audience_id]);
 
         return MessageGearsAudienceData::from(json_decode($response->getBody()));
+    }
+
+    /**
+     * Get a list of paginated folders.
+     *
+     * @param int $page
+     * @param int $limit
+     * @return \Illuminate\Pagination\LengthAwarePaginator<\Actengage\CaseyJones\Data\MessageGearsFolderData>
+     * @throws \GuzzleHttp\Exception\ClientException
+     * @throws \GuzzleHttp\Exception\ServerException
+     */
+    public function getFolders(int $page = 1, int $limit = 50): LengthAwarePaginator
+    {
+        $response = $this->accelerator->get('template/folder', [
+            'query' => [
+                'page' => max(0, $page - 1),
+                'size' => $limit
+            ]
+        ]);
+
+        $data = json_decode($response->getBody());
+
+        return (new LengthAwarePaginator(
+            $data->content, $data->totalElements, $data->size, $page
+        ))->through(fn (object $data) => MessageGearsTemplateData::from($data));
+    }
+
+    /**
+     * Get the all folders.
+     *
+     * @return \Illuminate\Support\Collection
+     * @throws \GuzzleHttp\Exception\ClientException
+     * @throws \GuzzleHttp\Exception\ServerException
+     */
+    public function getAllFolders(): Collection
+    {
+        return Cache::remember("{$this->accelerator->apiKey}-folders", now()->addHour(), function() {
+            $folders = collect();
+            
+            $page = 0;
+            
+            do {
+                $response = $this->accelerator->get('template/folder', [
+                    'query' => [
+                        'page' => $page,
+                        'size' => 100
+                    ]
+                ]);
+
+                $data = json_decode($response->getBody());
+                            
+                $folders->push(...$data->content);
+
+                $page++;
+            } while(!$data->last);
+
+            return $folders;
+        });
+    }
+
+    /**
+     * Get the folder tree.
+     *
+     * @return \Illuminate\Support\Collection
+     * @throws \GuzzleHttp\Exception\ClientException
+     * @throws \GuzzleHttp\Exception\ServerException
+     */
+    public function getFolderTree(): Collection
+    {
+        return Cache::remember("{$this->accelerator->apiKey}-folder-tree", now()->addHour(), function() {
+            $folders = $this->getAllFolders()->map(function ($folder) {
+                $folder->children = collect();
+
+                return $folder;
+            });
+            
+            $keyed = $folders->keyBy('id');
+
+            foreach($folders as $index => $folder) {
+                if(!isset($folder->parentId)) {
+                    continue;
+                }
+
+                if($parent = $keyed->get($folder->parentId)) {
+                    $parent->children->push($folder);
+
+                    $folders->forget($index);
+                }
+            }
+
+            return $folders->first()->children;
+        });
     }
 }

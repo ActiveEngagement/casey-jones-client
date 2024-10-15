@@ -4,6 +4,7 @@ namespace Actengage\CaseyJones\Resources;
 
 use Actengage\CaseyJones\Client;
 use Actengage\CaseyJones\Concerns\InteractsWithResponses;
+use Actengage\CaseyJones\Data\InstanceData;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
@@ -22,22 +23,28 @@ class InstanceResource
      *
      * @param array|null $query
      * @param array $options
-     * @return LengthAwarePaginator
+     * @return \Illuminate\Pagination\LengthAwarePaginator<Actengage\CaseyJones\Data\InstanceData>
+     * @throws \GuzzleHttp\Exception\ServerException
+     * @throws \GuzzleHttp\Exception\ClientException
      */
-    public function list(?array $query = null, array $options = []): LengthAwarePaginator
+    public function index(?array $query = null, array $options = []): LengthAwarePaginator
     {
         $response = $this->client->get('instances', [
             'query' => $query
         ]);
 
-        return $this->paginate($response, $options);
+        return $this->paginate($response, $options)->through(
+            fn (array $data) => InstanceData::from($data)
+        );
     }
 
     /**
      * Get an array of all the resources.
      *
      * @param array|null $query
-     * @return Collection
+     * @return \Illuminate\Support\Collection<Actengage\CaseyJones\Data\InstanceData>
+     * @throws \GuzzleHttp\Exception\ServerException
+     * @throws \GuzzleHttp\Exception\ClientException
      */
     public function all(?array $query = null): Collection
     {
@@ -45,62 +52,100 @@ class InstanceResource
             'query' => $query
         ]);
 
-        return collect($this->decode($response));
+        return InstanceData::collect(
+            $this->decode($response), Collection::class
+        );
     }
 
     /**
      * Create a resource.
      *
      * @param array $attributes
-     * @return array
+     * @return \Actengage\CaseyJones\Data\InstanceData
+     * @throws \GuzzleHttp\Exception\ServerException
+     * @throws \GuzzleHttp\Exception\ClientException
      */
-    public function create(array $attributes): array
+    public function create(array $attributes): InstanceData
     {
         $response = $this->client->post('instances', [
             'form_params' => $attributes
         ]);
 
-        return $this->decode($response);
+        return InstanceData::from($this->decode($response));
     }
 
     /**
      * Show the specified resource.
      *
-     * @param int $id
-     * @return array
+     * @param int $instance_id
+     * @return \Actengage\CaseyJones\Data\InstanceData
+     * @throws \GuzzleHttp\Exception\ServerException
+     * @throws \GuzzleHttp\Exception\ClientException
      */
-    public function show(int $id): array
+    public function show(int $instance_id): InstanceData
     {
-        $response = $this->client->get(sprintf('instances/%s', $id));
+        $response = $this->client->get(sprintf('instances/%s', $instance_id));
 
-        return $this->decode($response);
+        return InstanceData::from($this->decode($response));
     }
 
     /**
      * Update a resource.
      *
      * @param array $attributes
-     * @return array
+     * @return \Actengage\CaseyJones\Data\InstanceData
+     * @throws \GuzzleHttp\Exception\ServerException
+     * @throws \GuzzleHttp\Exception\ClientException
      */
-    public function update(int $id, array $attributes): array
+    public function update(int $instance_id, array $attributes): InstanceData
     {
-        $response = $this->client->put(sprintf('instances/%s', $id), [
+        $response = $this->client->put(sprintf('instances/%s', $instance_id), [
             'form_params' => $attributes
         ]);
 
-        return $this->decode($response);
+        return InstanceData::from($this->decode($response));
     }
 
     /**
      * Delete the specified resource.
      *
-     * @param int $id
-     * @return array
+     * @param int $instance_id
+     * @return \Actengage\CaseyJones\Data\InstanceData
+     * @throws \GuzzleHttp\Exception\ServerException
+     * @throws \GuzzleHttp\Exception\ClientException
      */
-    public function delete(int $id): array
+    public function delete(int $instance_id): InstanceData
     {
-        return $this->decode(
-            $this->client->delete(sprintf('instances/%s', $id))
+        return InstanceData::from($this->decode(
+            $this->client->delete(sprintf('instances/%s', $instance_id))
+        ));
+    }
+
+    /**
+     * Get a template resource.
+     *
+     * @param int $instance_id
+     * @return \Actengage\CaseyJones\Resources\InstanceTemplateResource
+     */
+    public function templates(int $instance_id): InstanceTemplateResource
+    {
+        return new InstanceTemplateResource(
+            client: $this->client,
+            instance_id: $instance_id
+        );
+    }
+
+    /**
+     * Get a folder resource.
+     *
+     * @param int $instance_id
+     * @return \Actengage\CaseyJones\Resources\InstanceFolderResource
+     */
+    public function folders(int $instance_id): InstanceFolderResource
+    {
+        return new InstanceFolderResource(
+            client: $this->client,
+            instance_id: $instance_id
         );
     }
     

@@ -126,13 +126,13 @@ trait InteractsWithGuzzleClient
     /**
      * Mock an HTTP client.
      *
-     * @param HttpClient|MockHandler $handler
+     * @param MockHandler|array $handler
      * @return void
      */
-    public static function mock(MockHandler $handler): void
+    public static function mock(MockHandler|array $handler): void
     {
         static::$client = new Client([
-            'handler' => $handler
+            'handler' => is_array($handler) ? new MockHandler($handler) : $handler
         ]);
     }
 }

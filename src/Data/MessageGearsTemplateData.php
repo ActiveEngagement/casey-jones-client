@@ -13,21 +13,21 @@ class MessageGearsTemplateData extends Data implements Mockable
     public function __construct(
         public int $id,
         public string $name,
-        public ?string $subject,
-        public ?string $description,
-        public ?string $html,
-        public ?string $text,
-        public ?string $fromName,
-        public ?string $fromAddress,
-        public ?string $replyToAddress,
-        public MessageGearsFolderData $folder,
+        public ?string $subject = null,
+        public ?string $description = null,
+        public ?string $html = null,
+        public ?string $text = null,
+        public ?string $fromName = null,
+        public ?string $fromAddress = null,
+        public ?string $replyToAddress = null,
+        public ?MessageGearsFolderData $folder = null,
         /** @var MessageGearsSampleRecipientData[] */
         #[DataCollectionOf(MessageGearsSampleRecipientData::class)]
         public ?array $sampleRecipients,
         /** @var MessageGearsSampleRecipientData[] */
         #[DataCollectionOf(MessageGearsTemplateLibraryData::class)]
         public ?array $templateLibraries,
-        public bool $locked,
+        public bool $locked = false,
     ) {}
 
     /**

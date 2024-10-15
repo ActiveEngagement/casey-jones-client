@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Actengage\CaseyJones\Services\MessageGears accelerator(\Actengage\MessageGears\Accelerator $instance)
  * @method static \Actengage\CaseyJones\Data\MessageGearsMarketingCampaignJobStatusData getMarketingCampaignJobStatus(int $campaign_id, int $job_id)
  * @method static \Actengage\CaseyJones\Data\MessageGearsMarketingCampaignJobStatusData checkMarketingCampaignJobStatus(int $campaign_id, int $job_id)
+ * @method static \Illuminate\Pagination\LengthAwarePaginator<\Actengage\CaseyJones\Data\MessageGearsTemplateData> getTemplates(int $page = 1, int $limit = 50)
  * @method static \Actengage\CaseyJones\Data\MessageGearsTemplateData getTemplate(int $template_id)
  * @method static \Actengage\CaseyJones\Data\MessageGearsTemplateData createTemplate(array $attributes)
  * @method static \Actengage\CaseyJones\Data\MessageGearsTemplateData updateTemplate(int $template_id, array $attributes)
@@ -17,6 +18,9 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Actengage\CaseyJones\Data\MessageGearsMarketingCampaignData getMarketingCampaign(int $campaign_id)
  * @method static \Actengage\CaseyJones\Data\MessageGearsMarketingCampaignData updateMarketingCampaign(int $campaign_id, array $attributes)
  * @method static \Actengage\CaseyJones\Data\MessageGearsAudienceData getAudience(int $audience_id)
+ * @method static \Illuminate\Pagination\LengthAwarePaginator<\Actengage\CaseyJones\Data\MessageGearsFolderData> getFolders()
+ * @method static \Illuminate\Support\Collection<\Actengage\CaseyJones\Data\MessageGearsFolderData> getAllFolders()
+ * @method static \Illuminate\Support\Collection getFolderTree()
  */
 class MessageGears extends Facade
 {
