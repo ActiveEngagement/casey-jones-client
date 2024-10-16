@@ -3,6 +3,8 @@
 namespace Actengage\CaseyJones\Services;
 
 use Actengage\CaseyJones\Data\MessageGearsAudienceData;
+use Actengage\CaseyJones\Data\MessageGearsFolderData;
+use Actengage\CaseyJones\Data\MessageGearsFolderTreeData;
 use Actengage\CaseyJones\Data\MessageGearsMarketingCampaignJobStatusData;
 use Actengage\CaseyJones\Data\MessageGearsMarketingCampaignData;
 use Actengage\CaseyJones\Data\MessageGearsMarketingCampaignNewJobData;
@@ -304,7 +306,7 @@ class MessageGears
 
         return (new LengthAwarePaginator(
             $data->content, $data->totalElements, $data->size, $page
-        ))->through(fn (object $data) => MessageGearsTemplateData::from($data));
+        ))->through(fn (object $data) => MessageGearsFolderData::from($data));
     }
 
     /**
@@ -336,24 +338,22 @@ class MessageGears
                 $page++;
             } while(!$data->last);
 
-            return $folders;
+            return MessageGearsFolderData::collect($folders);
         });
     }
 
     /**
      * Get the folder tree.
      *
-     * @return \Illuminate\Support\Collection
+     * @return array
      * @throws \GuzzleHttp\Exception\ClientException
      * @throws \GuzzleHttp\Exception\ServerException
      */
-    public function getFolderTree(): Collection
+    public function getFolderTree(): array
     {
         return Cache::remember("{$this->accelerator->apiKey}-folder-tree", now()->addHour(), function() {
             $folders = $this->getAllFolders()->map(function ($folder) {
-                $folder->children = collect();
-
-                return $folder;
+                return MessageGearsFolderTreeData::from($folder);
             });
             
             $keyed = $folders->keyBy('id');
@@ -364,7 +364,7 @@ class MessageGears
                 }
 
                 if($parent = $keyed->get($folder->parentId)) {
-                    $parent->children->push($folder);
+                    array_push($parent->children, $folder);
 
                     $folders->forget($index);
                 }
