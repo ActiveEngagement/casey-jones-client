@@ -1,3 +1,10 @@
+# [1.0.0-beta.6](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.5...v1.0.0-beta.6) (2024-10-16)
+
+
+### Bug Fixes
+
+* updated data types ([f43985b](https://github.com/ActiveEngagement/casey-jones-client/commit/f43985bdb6d5868a7bbec92919b39cba0243572c))
+
 # [1.0.0-beta.5](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.4...v1.0.0-beta.5) (2024-10-15)
 
 
