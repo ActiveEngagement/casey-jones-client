@@ -49,7 +49,7 @@ class InstanceTemplateResource
         $response = $this->client->post(sprintf(
             'instances/%s/templates', $this->instance_id
         ), [
-            'form_params' => $attributes
+            'json' => $attributes
         ]);
 
         return MessageGearsTemplateData::from($this->decode($response));
@@ -81,7 +81,7 @@ class InstanceTemplateResource
         $response = $this->client->put(sprintf(
             'instances/%s/templates/%s', $this->instance_id, $id
         ), [
-            'form_params' => $attributes
+            'json' => $attributes
         ]);
 
         return MessageGearsTemplateData::from($this->decode($response));

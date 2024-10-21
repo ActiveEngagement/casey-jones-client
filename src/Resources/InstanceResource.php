@@ -68,7 +68,7 @@ class InstanceResource
     public function create(array $attributes): InstanceData
     {
         $response = $this->client->post('instances', [
-            'form_params' => $attributes
+            'json' => $attributes
         ]);
 
         return InstanceData::from($this->decode($response));
@@ -100,7 +100,7 @@ class InstanceResource
     public function update(int $instance_id, array $attributes): InstanceData
     {
         $response = $this->client->put(sprintf('instances/%s', $instance_id), [
-            'form_params' => $attributes
+            'json' => $attributes
         ]);
 
         return InstanceData::from($this->decode($response));

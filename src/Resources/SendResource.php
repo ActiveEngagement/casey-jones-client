@@ -44,7 +44,7 @@ class SendResource
     public function create(array $attributes): SendData
     {
         $response = $this->client->post('sends', [
-            'form_params' => $attributes
+            'json' => $attributes
         ]);
 
         return SendData::from($this->decode($response));
@@ -73,7 +73,7 @@ class SendResource
     public function update(string $send_id, array $attributes): SendData
     {
         $response = $this->client->put(sprintf('sends/%s', $send_id), [
-            'form_params' => $attributes
+            'json' => $attributes
         ]);
 
         return SendData::from($this->decode($response));
