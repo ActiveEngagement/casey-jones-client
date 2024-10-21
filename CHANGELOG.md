@@ -1,3 +1,10 @@
+# [1.0.0-beta.9](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.8...v1.0.0-beta.9) (2024-10-21)
+
+
+### Bug Fixes
+
+* updated form_params to json ([8b15e53](https://github.com/ActiveEngagement/casey-jones-client/commit/8b15e535f4dcb4282b28e45932b0527215b59503))
+
 # [1.0.0-beta.8](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.7...v1.0.0-beta.8) (2024-10-21)
 
 
