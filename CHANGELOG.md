@@ -1,3 +1,10 @@
+# [1.0.0-beta.8](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.7...v1.0.0-beta.8) (2024-10-21)
+
+
+### Bug Fixes
+
+* added send cancelled event ([e6df330](https://github.com/ActiveEngagement/casey-jones-client/commit/e6df330142a6fc708a5877fb8633e47ead76f2e9))
+
 # [1.0.0-beta.7](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2024-10-21)
 
 
