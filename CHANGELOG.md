@@ -1,3 +1,10 @@
+# [1.0.0-beta.7](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2024-10-21)
+
+
+### Bug Fixes
+
+* added SendScheduled event ([ee2c7bc](https://github.com/ActiveEngagement/casey-jones-client/commit/ee2c7bcca1df7360b0262660119d9bac15c363f8))
+
 # [1.0.0-beta.6](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.5...v1.0.0-beta.6) (2024-10-16)
 
 
