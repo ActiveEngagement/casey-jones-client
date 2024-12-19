@@ -1,3 +1,10 @@
+# [1.0.0-beta.10](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.9...v1.0.0-beta.10) (2024-12-19)
+
+
+### Bug Fixes
+
+* fix attribute casting for meta and data_variables on send model ([761b5ab](https://github.com/ActiveEngagement/casey-jones-client/commit/761b5ab2d4824ea8bb5d7095281054ca26a24844))
+
 # [1.0.0-beta.9](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.8...v1.0.0-beta.9) (2024-10-21)
 
 
