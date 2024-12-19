@@ -1,3 +1,10 @@
+# [1.0.0-beta.11](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.10...v1.0.0-beta.11) (2024-12-19)
+
+
+### Bug Fixes
+
+* fix another issues with casting empty arrays as objects ([ef07239](https://github.com/ActiveEngagement/casey-jones-client/commit/ef072396303db5324602dd87e8474f1a939d00f8))
+
 # [1.0.0-beta.10](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.9...v1.0.0-beta.10) (2024-12-19)
 
 
