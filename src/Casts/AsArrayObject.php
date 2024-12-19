@@ -32,12 +32,16 @@ class AsArrayObject implements Castable
 
             public function set($model, $key, $value, $attributes)
             {
-                return [$key => Json::encode((object) $value)];
+                if(empty($value)) {
+                    $value = (object) [];
+                }
+
+                return [$key => Json::encode($value)];
             }
 
             public function serialize($model, string $key, $value, array $attributes)
             {
-                return $value->getArrayCopy();
+                return empty($value = $value->getArrayCopy()) ? (object) $value : $value;
             }
         };
     }
