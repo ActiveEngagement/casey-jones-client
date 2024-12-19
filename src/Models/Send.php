@@ -2,6 +2,7 @@
 
 namespace Actengage\CaseyJones\Models;
 
+use Actengage\CaseyJones\Casts\AsArrayObject;
 use Actengage\CaseyJones\Casts\MessageGearsFolder;
 use Actengage\CaseyJones\Enums\SendStatus;
 use Carbon\Carbon;
@@ -56,9 +57,9 @@ class Send extends Model
     {
         return [
             'status' => SendStatus::class,
-            'meta' => 'json',
+            'meta' => AsArrayObject::class,
             'folder' => MessageGearsFolder::class,
-            'data_variables' => 'json',
+            'data_variables' => AsArrayObject::class,
             'scheduled_at' => 'datetime',
             'failed_at' => 'datetime',
             'delivered_at' => 'datetime',
