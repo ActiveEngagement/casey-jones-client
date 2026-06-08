@@ -8,7 +8,7 @@ use Actengage\CaseyJones\Contracts\Mockable;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-/** @typescript MessageGearsTemplateLibrary */
+#[TypeScript(name: 'MessageGearsTemplateLibrary')]
 class MessageGearsTemplateLibraryData extends Data implements Mockable
 {
     public function __construct(

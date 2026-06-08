@@ -8,8 +8,9 @@ use Actengage\CaseyJones\Contracts\Mockable;
 use Actengage\CaseyJones\Enums\SendStatus;
 use Illuminate\Support\Str;
 use Spatie\LaravelData\Data;
+use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-/** @typescript Send */
+#[TypeScript(name: 'Send')]
 class SendData extends Data implements Mockable
 {
     /**

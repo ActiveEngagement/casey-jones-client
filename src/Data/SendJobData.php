@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Actengage\CaseyJones\Data;
 
 use Spatie\LaravelData\Data;
+use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-/** @typescript SendJob */
+#[TypeScript(name: 'SendJob')]
 class SendJobData extends Data
 {
     public function __construct(

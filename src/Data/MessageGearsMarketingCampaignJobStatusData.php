@@ -8,8 +8,9 @@ use Actengage\CaseyJones\Contracts\Mockable;
 use Actengage\CaseyJones\Enums\MessageGearsJobActivityStatus;
 use Actengage\CaseyJones\Enums\MessageGearsJobStatus;
 use Spatie\LaravelData\Data;
+use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-/** @typescript MessageGearsMarketingCampaignJobStatus */
+#[TypeScript(name: 'MessageGearsMarketingCampaignJobStatus')]
 class MessageGearsMarketingCampaignJobStatusData extends Data implements Mockable
 {
     public function __construct(

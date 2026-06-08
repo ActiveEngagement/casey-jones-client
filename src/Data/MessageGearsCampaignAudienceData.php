@@ -10,7 +10,7 @@ use Actengage\CaseyJones\Enums\MessageGearsAudienceDataType;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-/** @typescript MessageGearsCampaignAudience */
+#[TypeScript(name: 'MessageGearsCampaignAudience')]
 class MessageGearsCampaignAudienceData extends Data implements Mockable
 {
     public function __construct(

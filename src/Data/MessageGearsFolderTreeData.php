@@ -8,7 +8,7 @@ use Actengage\CaseyJones\Contracts\Mockable;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-/** @typescript MessageGearsFolderTree */
+#[TypeScript(name: 'MessageGearsFolderTree')]
 class MessageGearsFolderTreeData extends Data implements Mockable
 {
     /**

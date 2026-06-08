@@ -6,8 +6,9 @@ namespace Actengage\CaseyJones\Data;
 
 use Actengage\CaseyJones\Contracts\Mockable;
 use Spatie\LaravelData\Data;
+use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-/** @typescript Instance */
+#[TypeScript(name: 'Instance')]
 class InstanceData extends Data implements Mockable
 {
     public function __construct(

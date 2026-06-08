@@ -9,7 +9,7 @@ use Actengage\CaseyJones\Enums\MessageGearsScheduleMode;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-/** @typescript MessageGearsCampaignSchedule */
+#[TypeScript(name: 'MessageGearsCampaignSchedule')]
 class MessageGearsCampaignScheduleData extends Data implements Mockable
 {
     public function __construct(

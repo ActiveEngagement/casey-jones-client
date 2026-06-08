@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Actengage\CaseyJones\Enums;
 
-/** @typescript */
+use Spatie\TypeScriptTransformer\Attributes\TypeScript;
+
+#[TypeScript]
 enum MessageGearsJobStatus: string
 {
     case Initializing = 'INITIALIZING';
