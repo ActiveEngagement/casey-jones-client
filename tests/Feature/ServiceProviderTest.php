@@ -4,6 +4,8 @@ use Actengage\CaseyJones\Client;
 use Actengage\CaseyJones\Events\Dispatcher;
 use Actengage\CaseyJones\Redis\Stream;
 use Actengage\CaseyJones\Services\MessageGears;
+use Illuminate\Redis\Connections\Connection;
+use Illuminate\Support\Facades\Redis;
 
 it('registers the core singletons and aliases', function () {
     expect(app(Client::class))->toBeInstanceOf(Client::class)
@@ -15,11 +17,7 @@ it('registers the core singletons and aliases', function () {
 });
 
 it('resolves the redis stream singleton from the configured connection', function () {
-    config()->set('database.redis.casey', [
-        'host' => '127.0.0.1',
-        'port' => 6379,
-        'database' => 0,
-    ]);
+    Redis::shouldReceive('connection')->andReturn(Mockery::mock(Connection::class));
 
     expect(app(Stream::class))->toBeInstanceOf(Stream::class)
         ->and(app('casey.stream'))->toBe(app(Stream::class));
