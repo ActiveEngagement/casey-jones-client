@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Actengage\CaseyJones\Enums;
 
 enum MessageGearsAudienceDataProviderType: string

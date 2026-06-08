@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Actengage\CaseyJones\Data;
 
 use Actengage\CaseyJones\Contracts\Mockable;
@@ -7,34 +9,33 @@ use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-/** @typescript */
+#[TypeScript(name: 'MessageGearsTemplate')]
 class MessageGearsTemplateData extends Data implements Mockable
 {
     public function __construct(
         public int $id,
         public string $name,
-        public ?string $subject,
-        public ?string $description,
-        public ?string $html,
-        public ?string $text,
-        public ?string $fromName,
-        public ?string $fromAddress,
-        public ?string $replyToAddress,
-        public MessageGearsFolderData $folder,
+        public ?string $subject = null,
+        public ?string $description = null,
+        public ?string $html = null,
+        public ?string $text = null,
+        public ?string $fromName = null,
+        public ?string $fromAddress = null,
+        public ?string $replyToAddress = null,
+        public ?MessageGearsFolderData $folder = null,
         /** @var MessageGearsSampleRecipientData[] */
         #[DataCollectionOf(MessageGearsSampleRecipientData::class)]
-        public ?array $sampleRecipients,
+        public ?array $sampleRecipients = null,
         /** @var MessageGearsSampleRecipientData[] */
         #[DataCollectionOf(MessageGearsTemplateLibraryData::class)]
-        public ?array $templateLibraries,
-        public bool $locked,
+        public ?array $templateLibraries = null,
+        public bool $locked = false,
     ) {}
 
     /**
      * Mock an instance of the class
      *
-     * @param array $attributes
-     * @return static
+     * @param  array<string, mixed>  $attributes
      */
     public static function mock(array $attributes = []): static
     {

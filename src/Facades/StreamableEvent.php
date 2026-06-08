@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Actengage\CaseyJones\Facades;
 
+use Actengage\CaseyJones\Events\Dispatcher;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \Actengage\CaseyJones\Events\Dispatcher
- * @method static void listen(string|array<class-string<\Actengage\CaseyJones\Contracts\Streamable>> $events, \Illuminate\Events\QueuedClosure|\Closure|string|array $listener)
- * @method static void catch(\Illuminate\Events\QueuedClosure|\Closure)
+ * @see Dispatcher
+ *
+ * @method static void listen(string|array<int, class-string<\Actengage\CaseyJones\Contracts\Streamable>> $events, \Illuminate\Events\QueuedClosure|\Closure|string|array<int, mixed>|null $listener = null)
+ * @method static void catch(\Illuminate\Events\QueuedClosure|\Closure|string|array<int, mixed> $listener)
  */
 class StreamableEvent extends Facade
 {

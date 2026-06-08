@@ -4,12 +4,13 @@ namespace Actengage\CaseyJones\Resources;
 
 use Actengage\CaseyJones\Client;
 use Actengage\CaseyJones\Concerns\InteractsWithResponses;
+use Actengage\CaseyJones\Data\SendData;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class SendResource
 {
     use InteractsWithResponses;
-    
+
     public function __construct(
         protected readonly Client $client
     ) {
@@ -19,100 +20,88 @@ class SendResource
     /**
      * Get a paginated listing of resources.
      *
-     * @param array|null $query
-     * @param array $options
-     * @return LengthAwarePaginator
+     * @param  array<string, mixed>|null  $query
+     * @param  array<string, mixed>  $options
+     * @return LengthAwarePaginator<int, SendData>
      */
-    public function list(?array $query = null, array $options = []): LengthAwarePaginator
+    public function index(?array $query = null, array $options = []): LengthAwarePaginator
     {
         $response = $this->client->get('sends', [
-            'query' => $query
+            'query' => $query,
         ]);
 
-        return $this->paginate($response, $options);
+        return $this->paginate($response, $options)->through(
+            fn (array $send) => SendData::from($send)
+        );
     }
 
     /**
      * Create a resource.
      *
-     * @param array $attributes
-     * @return array
+     * @param  array<string, mixed>  $attributes
      */
-    public function create(array $attributes): array
+    public function create(array $attributes): SendData
     {
         $response = $this->client->post('sends', [
-            'form_params' => $attributes
+            'json' => $attributes,
         ]);
 
-        return $this->decode($response);
+        return SendData::from($this->decode($response));
     }
 
     /**
      * Show the specified resource.
-     *
-     * @param string $id
-     * @return array
      */
-    public function show(string $id): array
+    public function show(string $send_id): SendData
     {
-        $response = $this->client->get(sprintf('sends/%s', $id));
+        $response = $this->client->get(sprintf('sends/%s', $send_id));
 
-        return $this->decode($response);
+        return SendData::from($this->decode($response));
     }
 
     /**
      * Update the specified resource.
      *
-     * @param string $id
-     * @param array $attributes
-     * @return array
+     * @param  array<string, mixed>  $attributes
      */
-    public function update(string $id, array $attributes): array
+    public function update(string $send_id, array $attributes): SendData
     {
-        $response = $this->client->put(sprintf('sends/%s', $id), [
-            'form_params' => $attributes
+        $response = $this->client->put(sprintf('sends/%s', $send_id), [
+            'json' => $attributes,
         ]);
 
-        return $this->decode($response);
+        return SendData::from($this->decode($response));
     }
 
     /**
      * Delete the specified resource.
-     *
-     * @param string $id
-     * @return array
      */
-    public function delete(string $id): array
+    public function delete(string $send_id): SendData
     {
-        return $this->decode(
-            $this->client->delete(sprintf('sends/%s', $id))
+        return SendData::from($this->decode(
+            $this->client->delete(sprintf('sends/%s', $send_id))
+        ));
+    }
+
+    /**
+     * Get the send audience resource.
+     */
+    public function audience(string $send_id): SendAudienceResource
+    {
+        return new SendAudienceResource(
+            client: $this->client,
+            send_id: $send_id
         );
     }
 
     /**
-     * Show the specified resource.
-     *
-     * @param string $id
-     * @return array
+     * Get the send campaign resource.
      */
-    public function audience(string $id): array
+    public function campaign(string $send_id): SendCampaignResource
     {
-        $response = $this->client->get(sprintf('sends/%s/audience', $id));
-
-        return $this->decode($response);
+        return new SendCampaignResource(
+            client: $this->client,
+            send_id: $send_id
+        );
     }
-
-    /**
-     * Show the specified resource.
-     *
-     * @param string $id
-     * @return array
-     */
-    public function campaign(string $id): array
-    {
-        $response = $this->client->get(sprintf('sends/%s/campaign', $id));
-
-        return $this->decode($response);
-    }
-
 }

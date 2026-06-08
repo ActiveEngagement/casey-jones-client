@@ -1,7 +1,7 @@
 <?php
 
 return [
-    
+
     /*
     |--------------------------------------------------------------------------
     | Api Key
@@ -26,7 +26,7 @@ return [
     |
     */
 
-    'base_uri' => env('CASEY_BASE_URI', 'https://casey.actenage.com/api/'),
+    'base_uri' => env('CASEY_BASE_URI', 'https://casey.actengage.com/api/'),
 
     /*
     |--------------------------------------------------------------------------
@@ -40,6 +40,6 @@ return [
     */
 
     'redis' => [
-        'connection' => env('CASEY_REDIS_CONNECTION', 'casey')
-    ]
+        'connection' => env('CASEY_REDIS_CONNECTION', 'casey'),
+    ],
 ];

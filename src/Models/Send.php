@@ -2,12 +2,17 @@
 
 namespace Actengage\CaseyJones\Models;
 
+use Actengage\CaseyJones\Casts\AsArrayObject;
 use Actengage\CaseyJones\Casts\MessageGearsFolder;
+use Actengage\CaseyJones\Data\MessageGearsFolderData;
+use Actengage\CaseyJones\Database\Factories\SendFactory;
 use Actengage\CaseyJones\Enums\SendStatus;
 use Carbon\Carbon;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Database\Eloquent\BroadcastsEvents;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,8 +20,21 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int|null $instance_id
+ * @property int|null $campaign_id
+ * @property SendStatus $status
+ * @property ArrayObject<array-key, mixed>|null $meta
+ * @property MessageGearsFolderData|null $folder
+ * @property ArrayObject<array-key, mixed>|null $data_variables
+ * @property int|null $mailingid
+ * @property Carbon|null $scheduled_at
+ * @property Carbon|null $failed_at
+ * @property Carbon|null $delivered_at
+ */
 class Send extends Model
 {
+    /** @use HasFactory<SendFactory> */
     use BroadcastsEvents, HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
@@ -44,21 +62,44 @@ class Send extends Model
 
     protected $attributes = [
         'meta' => '{}',
-        'data_variables' => '[]'
+        'data_variables' => '{}',
     ];
-    
+
+    /**
+     * Get the columns that should receive a unique identifier.
+     *
+     * The primary key stays an auto-incrementing integer; the UUID is stored
+     * in the separate "uuid" column.
+     *
+     * @return array<int, string>
+     */
+    #[\Override]
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory(): SendFactory
+    {
+        return SendFactory::new();
+    }
+
     /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
      */
+    #[\Override]
     protected function casts(): array
     {
         return [
             'status' => SendStatus::class,
-            'meta' => 'json',
+            'meta' => AsArrayObject::class,
             'folder' => MessageGearsFolder::class,
-            'data_variables' => 'json',
+            'data_variables' => AsArrayObject::class,
             'scheduled_at' => 'datetime',
             'failed_at' => 'datetime',
             'delivered_at' => 'datetime',
@@ -68,7 +109,7 @@ class Send extends Model
     /**
      * Get the jobs for the send.
      *
-     * @return HasMany
+     * @return HasMany<SendJob, $this>
      */
     public function jobs(): HasMany
     {
@@ -79,7 +120,7 @@ class Send extends Model
      * Get and set the campaign id. This prevents using anything but the test
      * campaign for environments other than production.
      *
-     * @return Attribute
+     * @return Attribute<int|null, int|null>
      */
     protected function campaignId(): Attribute
     {
@@ -92,9 +133,7 @@ class Send extends Model
     /**
      * Scope the query for the given statuses.
      *
-     * @param Builder $query
-     * @param SendStatus ...$statuses
-     * @return void
+     * @param  Builder<static>  $query
      */
     public function scopeStatus(Builder $query, SendStatus ...$statuses): void
     {
@@ -104,8 +143,7 @@ class Send extends Model
     /**
      * Scope the query for draft statuses.
      *
-     * @param Builder $query
-     * @return void
+     * @param  Builder<static>  $query
      */
     public function scopeDraft(Builder $query): void
     {
@@ -115,8 +153,7 @@ class Send extends Model
     /**
      * Scope the query for scheduled statuses.
      *
-     * @param Builder $query
-     * @return void
+     * @param  Builder<static>  $query
      */
     public function scopeScheduled(Builder $query): void
     {
@@ -126,8 +163,7 @@ class Send extends Model
     /**
      * Scope the query for active statuses.
      *
-     * @param Builder $query
-     * @return void
+     * @param  Builder<static>  $query
      */
     public function scopeActive(Builder $query): void
     {
@@ -137,8 +173,7 @@ class Send extends Model
     /**
      * Scope the query for failed statuses.
      *
-     * @param Builder $query
-     * @return void
+     * @param  Builder<static>  $query
      */
     public function scopeFailed(Builder $query): void
     {
@@ -148,8 +183,7 @@ class Send extends Model
     /**
      * Scope the query for queued statuses.
      *
-     * @param Builder $query
-     * @return void
+     * @param  Builder<static>  $query
      */
     public function scopeQueued(Builder $query): void
     {
@@ -159,9 +193,7 @@ class Send extends Model
     /**
      * Scope the query to the given instance.
      *
-     * @param Builder $query
-     * @param Instance|int $campaign
-     * @return void
+     * @param  Builder<static>  $query
      */
     public function scopeInstance(Builder $query, int $instance): void
     {
@@ -171,9 +203,7 @@ class Send extends Model
     /**
      * Scope the query to the given campaign.
      *
-     * @param Builder $query
-     * @param int $campaign
-     * @return void
+     * @param  Builder<static>  $query
      */
     public function scopeCampaignId(Builder $query, int $campaign_id): void
     {
@@ -183,26 +213,23 @@ class Send extends Model
     /**
      * Scope the query for sends scheduled within a date range.
      *
-     * @param Builder $query
-     * @param Carbon|string $date
-     * @return void
+     * @param  Builder<static>  $query
      */
     public function scopeScheduledAt(Builder $query, Carbon|string $date): void
     {
-        if(is_string($date)) {
+        if (is_string($date)) {
             $date = Carbon::parse($date);
         }
-        
+
         $query->whereBetween('scheduled_at', [
-            $date->clone()->subMinutes(5), $date->clone()->addMinutes(5)
+            $date->clone()->subMinutes(5), $date->clone()->addMinutes(5),
         ]);
     }
 
     /**
      * SCope the query for sends that are ready to send.
      *
-     * @param Builder $query
-     * @return void
+     * @param  Builder<static>  $query
      */
     public function scopeReadyToSend(Builder $query): void
     {
@@ -213,9 +240,8 @@ class Send extends Model
 
     /**
      * A scope restricted to sends that have been active for at least an hour.
-     * 
-     * @param Builder $query
-     * @return void
+     *
+     * @param  Builder<static>  $query
      */
     public function scopeActiveTooLong(Builder $query): void
     {
@@ -226,9 +252,6 @@ class Send extends Model
 
     /**
      * Detemines if the send is one of the given statuses.
-     *
-     * @param SendStatus ...$statuses
-     * @return boolean
      */
     public function isStatus(SendStatus ...$statuses): bool
     {
@@ -238,7 +261,7 @@ class Send extends Model
     /**
      * Get the channels that model events should broadcast on.
      *
-     * @return array<int, \Illuminate\Broadcasting\Channel|\Illuminate\Database\Eloquent\Model>
+     * @return array<int, Channel|Model>
      */
     public function broadcastOn(string $event): array
     {
@@ -247,16 +270,14 @@ class Send extends Model
 
     /**
      * Bootstrap the model and its traits.
-     *
-     * @return void
      */
+    #[\Override]
     public static function booted(): void
     {
-        static::saving(function(Send $model) {
-            if($model->status === SendStatus::Draft) {
+        static::saving(function (Send $model) {
+            if ($model->status === SendStatus::Draft) {
                 $model->scheduled_at = null;
-            }
-            else if($model->status === SendStatus::Scheduled) {
+            } elseif ($model->status === SendStatus::Scheduled) {
                 $model->failed_at = null;
             }
         });

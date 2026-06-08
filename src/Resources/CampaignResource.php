@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Actengage\CaseyJones\Resources;
 
 use Actengage\CaseyJones\Client;
 use Actengage\CaseyJones\Concerns\InteractsWithResponses;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
 
-class AudienceResource
+class CampaignResource
 {
     use InteractsWithResponses;
 
@@ -18,8 +22,10 @@ class AudienceResource
     /**
      * Show the specified resource.
      *
-     * @param int $id
-     * @return array
+     * @return array<array-key, mixed>
+     *
+     * @throws ServerException
+     * @throws ClientException
      */
     public function show(int $id): array
     {

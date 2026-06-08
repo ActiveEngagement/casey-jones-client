@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Actengage\CaseyJones\Data;
 
 use Actengage\CaseyJones\Contracts\Mockable;
 use Actengage\CaseyJones\Enums\MessageGearsJobActivityStatus;
 use Actengage\CaseyJones\Enums\MessageGearsJobStatus;
 use Spatie\LaravelData\Data;
+use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-/** @typescript */
+#[TypeScript(name: 'MessageGearsMarketingCampaignJobStatus')]
 class MessageGearsMarketingCampaignJobStatusData extends Data implements Mockable
 {
     public function __construct(
@@ -15,33 +18,32 @@ class MessageGearsMarketingCampaignJobStatusData extends Data implements Mockabl
         public string $subjectLine,
         public ?bool $error = false,
         public ?string $errorMessage = null,
-        public MessageGearsJobStatus $jobStatus,
+        public ?MessageGearsJobStatus $jobStatus = null,
         public ?MessageGearsJobActivityStatus $jobActivityStatus = null,
-        public MessageGearsAccountData $account,
-        public string $category,
-        public int $startTime,
-        public string $notificationEmailAddress,
-        public int $deliveryCount,
-        public int $openCount,
-        public int $uniqueOpenCount,
-        public int $bounceCount,
-        public int $clickCount,
-        public int $uniqueClickCount,
-        public int $contentErrorCount,
-        public int $fblCount,
-        public int $unsubCount,
-        public int $suppressedCount,
-        public string $queryName,
-        public string $recipientSql,
-        public int $recipientCount,
-        public float $spamAssassinScore
+        public ?MessageGearsAccountData $account = null,
+        public string $category = '',
+        public int $startTime = 0,
+        public string $notificationEmailAddress = '',
+        public int $deliveryCount = 0,
+        public int $openCount = 0,
+        public int $uniqueOpenCount = 0,
+        public int $bounceCount = 0,
+        public int $clickCount = 0,
+        public int $uniqueClickCount = 0,
+        public int $contentErrorCount = 0,
+        public int $fblCount = 0,
+        public int $unsubCount = 0,
+        public int $suppressedCount = 0,
+        public string $queryName = '',
+        public string $recipientSql = '',
+        public int $recipientCount = 0,
+        public float $spamAssassinScore = 0.0
     ) {}
 
     /**
      * Mock an instance of the class.
      *
-     * @param array $attributes
-     * @return static
+     * @param  array<string, mixed>  $attributes
      */
     public static function mock(array $attributes = []): static
     {
@@ -53,7 +55,7 @@ class MessageGearsMarketingCampaignJobStatusData extends Data implements Mockabl
             'jobActivityStatus' => MessageGearsJobActivityStatus::Complete,
             'account' => MessageGearsAccountData::from([
                 'id' => config('services.mg.accelerator_account_id', 1),
-                'name' => 'Active Engagement Accelerator'
+                'name' => 'Active Engagement Accelerator',
             ]),
             'category' => 'AE',
             'startTime' => time(),
@@ -71,7 +73,7 @@ class MessageGearsMarketingCampaignJobStatusData extends Data implements Mockabl
             'queryName' => 'Alchemy Test Audience',
             'recipientSql' => '',
             'recipientCount' => 0,
-            'spamAssassinScore' => 0.0
+            'spamAssassinScore' => 0.0,
         ], $attributes));
     }
 }

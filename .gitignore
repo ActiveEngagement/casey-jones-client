@@ -1,4 +1,7 @@
 /vendor
 /database/database.sqlite
+/node_modules
 .DS_Store
 .phpunit.cache
+.env
+/resources/types/typescript-transformer-manifest.json

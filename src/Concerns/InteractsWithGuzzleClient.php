@@ -6,18 +6,20 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 
 trait InteractsWithGuzzleClient
 {
     /**
      * The http client instance.
-     *
-     * @var Client
      */
     protected static Client $client;
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @param  string|UriInterface  $uri
+     * @param  array<string, mixed>  $options
      */
     public function get($uri, array $options = []): ResponseInterface
     {
@@ -25,7 +27,10 @@ trait InteractsWithGuzzleClient
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @param  string|UriInterface  $uri
+     * @param  array<string, mixed>  $options
      */
     public function head($uri, array $options = []): ResponseInterface
     {
@@ -33,7 +38,10 @@ trait InteractsWithGuzzleClient
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @param  string|UriInterface  $uri
+     * @param  array<string, mixed>  $options
      */
     public function post($uri, array $options = []): ResponseInterface
     {
@@ -41,7 +49,10 @@ trait InteractsWithGuzzleClient
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @param  string|UriInterface  $uri
+     * @param  array<string, mixed>  $options
      */
     public function put($uri, array $options = []): ResponseInterface
     {
@@ -49,15 +60,21 @@ trait InteractsWithGuzzleClient
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @param  string|UriInterface  $uri
+     * @param  array<string, mixed>  $options
      */
     public function patch($uri, array $options = []): ResponseInterface
     {
         return static::$client->patch($uri, $options);
     }
-    
+
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @param  string|UriInterface  $uri
+     * @param  array<string, mixed>  $options
      */
     public function delete($uri, array $options = []): ResponseInterface
     {
@@ -65,7 +82,10 @@ trait InteractsWithGuzzleClient
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @param  string|UriInterface  $uri
+     * @param  array<string, mixed>  $options
      */
     public function getAsync($uri, array $options = []): PromiseInterface
     {
@@ -73,7 +93,10 @@ trait InteractsWithGuzzleClient
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @param  string|UriInterface  $uri
+     * @param  array<string, mixed>  $options
      */
     public function headAsync($uri, array $options = []): PromiseInterface
     {
@@ -81,7 +104,10 @@ trait InteractsWithGuzzleClient
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @param  string|UriInterface  $uri
+     * @param  array<string, mixed>  $options
      */
     public function postAsync($uri, array $options = []): PromiseInterface
     {
@@ -89,7 +115,10 @@ trait InteractsWithGuzzleClient
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @param  string|UriInterface  $uri
+     * @param  array<string, mixed>  $options
      */
     public function putAsync($uri, array $options = []): PromiseInterface
     {
@@ -97,15 +126,21 @@ trait InteractsWithGuzzleClient
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @param  string|UriInterface  $uri
+     * @param  array<string, mixed>  $options
      */
     public function patchAsync($uri, array $options = []): PromiseInterface
     {
         return static::$client->patchAsync($uri, $options);
     }
-    
+
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @param  string|UriInterface  $uri
+     * @param  array<string, mixed>  $options
      */
     public function deleteAsync($uri, array $options = []): PromiseInterface
     {
@@ -113,10 +148,7 @@ trait InteractsWithGuzzleClient
     }
 
     /**
-     * Mock an HTTP client.
-     *
-     * @param HttpClient $client
-     * @return void
+     * Set the HTTP client.
      */
     public static function client(Client $client): void
     {
@@ -126,13 +158,12 @@ trait InteractsWithGuzzleClient
     /**
      * Mock an HTTP client.
      *
-     * @param HttpClient|MockHandler $handler
-     * @return void
+     * @param  MockHandler|array<int, mixed>  $handler
      */
-    public static function mock(MockHandler $handler): void
+    public static function mock(MockHandler|array $handler): void
     {
         static::$client = new Client([
-            'handler' => $handler
+            'handler' => is_array($handler) ? new MockHandler($handler) : $handler,
         ]);
     }
 }

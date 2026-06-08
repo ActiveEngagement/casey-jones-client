@@ -2,7 +2,9 @@
 
 namespace Actengage\CaseyJones\Models;
 
+use Actengage\CaseyJones\Database\Factories\SendJobFactory;
 use GuzzleHttp\Exception\BadResponseException;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Database\Eloquent\BroadcastsEvents;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -13,8 +15,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 use Throwable;
 
+/**
+ * @property bool|null $failed
+ * @property int|null $status_code
+ * @property int|null $mailingid
+ * @property mixed $response
+ * @property string|null $error_message
+ * @property-read Send $send
+ */
 class SendJob extends Model
 {
+    /** @use HasFactory<SendJobFactory> */
     use BroadcastsEvents, HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
@@ -22,14 +33,37 @@ class SendJob extends Model
         'failed',
         'mailingid',
         'response',
-        'error_message'
+        'error_message',
     ];
+
+    /**
+     * Get the columns that should receive a unique identifier.
+     *
+     * The primary key stays an auto-incrementing integer; the UUID is stored
+     * in the separate "uuid" column.
+     *
+     * @return array<int, string>
+     */
+    #[\Override]
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory(): SendJobFactory
+    {
+        return SendJobFactory::new();
+    }
 
     /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
      */
+    #[\Override]
     protected function casts(): array
     {
         return [
@@ -43,7 +77,7 @@ class SendJob extends Model
     /**
      * Get the parent send.
      *
-     * @return BelongsTo
+     * @return BelongsTo<Send, $this>
      */
     public function send(): BelongsTo
     {
@@ -53,8 +87,7 @@ class SendJob extends Model
     /**
      * Scope the query for failed jobs.
      *
-     * @param Builder $query
-     * @return void
+     * @param  Builder<static>  $query
      */
     public function scopeFailed(Builder $query): void
     {
@@ -64,8 +97,7 @@ class SendJob extends Model
     /**
      * Scope the query for successful jobs.
      *
-     * @param Builder $query
-     * @return void
+     * @param  Builder<static>  $query
      */
     public function scopeSuccess(Builder $query): void
     {
@@ -75,8 +107,7 @@ class SendJob extends Model
     /**
      * Scope the query for pending jobs.
      *
-     * @param Builder $query
-     * @return void
+     * @param  Builder<static>  $query
      */
     public function scopePending(Builder $query): void
     {
@@ -86,8 +117,7 @@ class SendJob extends Model
     /**
      * Scope the query for mailingid.
      *
-     * @param Builder $query
-     * @return void
+     * @param  Builder<static>  $query
      */
     public function scopeMailingid(Builder $query, int $mailingid): void
     {
@@ -97,7 +127,7 @@ class SendJob extends Model
     /**
      * Get the channels that model events should broadcast on.
      *
-     * @return array<int, \Illuminate\Broadcasting\Channel|\Illuminate\Database\Eloquent\Model>
+     * @return array<int, Channel|Model>
      */
     public function broadcastOn(string $event): array
     {
@@ -106,43 +136,40 @@ class SendJob extends Model
 
     /**
      * Mark the job as failed.
-     *
-     * @param Throwable $e
-     * @return void
      */
     public function fail(Throwable $e): void
     {
         $this->fill([
             'failed' => true,
-            'mailingid' => $this->send->mailingid
+            'mailingid' => $this->send->mailingid,
         ]);
-        
-        if($e instanceof BadResponseException) {
+
+        if ($e instanceof BadResponseException) {
             $response = json_decode($e->getResponse()->getBody(), true);
 
             $this->update([
                 'response' => $response,
                 'status_code' => $e->getResponse()->getStatusCode(),
-                'error_message' => Arr::get($response, 'errorMessage', $e->getMessage()),
+                'error_message' => is_array($response)
+                    ? Arr::get($response, 'errorMessage', $e->getMessage())
+                    : $e->getMessage(),
             ]);
-        }
-        else {
+        } else {
             $this->update([
-                'error_message' => $e->getMessage()
+                'error_message' => $e->getMessage(),
             ]);
         }
     }
 
     /**
      * Bootstrap the model and its traits.
-     *
-     * @return void
      */
+    #[\Override]
     public static function booted(): void
     {
-        static::saving(function(SendJob $model) {
-            if($model->failed === null && $model->status_code) {
-                $model->failed = !($model->status_code >= 200 && $model->status_code < 300);
+        static::saving(function (SendJob $model) {
+            if ($model->failed === null && $model->status_code) {
+                $model->failed = ! ($model->status_code >= 200 && $model->status_code < 300);
             }
         });
     }

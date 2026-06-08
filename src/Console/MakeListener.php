@@ -36,6 +36,7 @@ class MakeListener extends GeneratorCommand
      * @param  string  $rawName
      * @return bool
      */
+    #[\Override]
     protected function alreadyExists($rawName)
     {
         return class_exists($rawName) ||
@@ -71,6 +72,7 @@ class MakeListener extends GeneratorCommand
      * @param  string  $rootNamespace
      * @return string
      */
+    #[\Override]
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Listeners';
@@ -79,8 +81,9 @@ class MakeListener extends GeneratorCommand
     /**
      * Get the console command options.
      *
-     * @return array
+     * @return array<int, array{0: string, 1: string|null, 2: int, 3: string}>
      */
+    #[\Override]
     protected function getOptions()
     {
         return [
