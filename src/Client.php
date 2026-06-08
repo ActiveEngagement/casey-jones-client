@@ -2,6 +2,7 @@
 
 namespace Actengage\CaseyJones;
 
+use Actengage\CaseyJones\Resources\CampaignResource;
 use Actengage\CaseyJones\Resources\SendResource;
 use Actengage\CaseyJones\Concerns\InteractsWithGuzzleClient;
 use Actengage\CaseyJones\Concerns\InteractsWithResponses;
@@ -54,6 +55,16 @@ class Client
     public function sends(): SendResource
     {
         return new SendResource($this);
+    }
+
+    /**
+     * Get the campaigns API resource.
+     *
+     * @return CampaignResource
+     */
+    public function campaigns(): CampaignResource
+    {
+        return new CampaignResource($this);
     }
 
     /**

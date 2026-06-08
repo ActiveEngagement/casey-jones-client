@@ -12,20 +12,21 @@
         "test": "phpunit"
     },
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "ext-redis": "*",
-        "laravel/framework": "^11.0",
+        "laravel/framework": "^13.0",
         "react/event-loop": "^1.5",
         "react/promise": "^3.2",
-        "spatie/laravel-data": "^4.9",
-        "actengage/laravel-message-gears": "^1.0"
+        "spatie/laravel-data": "^4.23",
+        "actengage/laravel-message-gears": "^4.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^9.5",
+        "orchestra/testbench": "^11.0",
         "laravel/pint": "^1.8",
-        "pestphp/pest": "^3.2",
-        "pestphp/pest-plugin-laravel": "^3.0",
-        "mockery/mockery": "^1.6"
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.0",
+        "mockery/mockery": "^1.6",
+        "laravel/boost": "^2.0"
     },
     "autoload": {
         "psr-4": {

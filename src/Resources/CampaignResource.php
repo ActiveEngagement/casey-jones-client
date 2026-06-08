@@ -5,7 +5,7 @@ namespace Actengage\CaseyJones\Resources;
 use Actengage\CaseyJones\Client;
 use Actengage\CaseyJones\Concerns\InteractsWithResponses;
 
-class AudienceResource
+class CampaignResource
 {
     use InteractsWithResponses;
 
@@ -20,6 +20,8 @@ class AudienceResource
      *
      * @param int $id
      * @return array
+     * @throws \GuzzleHttp\Exception\ServerException
+     * @throws \GuzzleHttp\Exception\ClientException
      */
     public function show(int $id): array
     {

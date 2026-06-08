@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+
+jobs:
+  pest:
+    runs-on: ubuntu-latest
+
+    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} - ${{ matrix.stability }}
+
+    continue-on-error: ${{ matrix.experimental || false }}
+
+    strategy:
+      # Keep running the rest of the matrix even if one combination fails.
+      fail-fast: false
+      matrix:
+        php: ["8.3", "8.4", "8.5"]
+        laravel: ["13.*"]
+        testbench: ["11.*"]
+        stability: ["prefer-stable"]
+        include:
+          # Future-proofing channel: track the in-development Laravel branch so
+          # we get early warning of upcoming breaking changes. Allowed to fail.
+          - php: "8.5"
+            laravel: "13.x-dev"
+            testbench: "11.x-dev"
+            stability: "prefer-stable"
+            experimental: true
+
+    steps:
+      - name: Git Checkout 🔀
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 🐘
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: redis, dom, curl, libxml, mbstring, zip, pcntl, bcmath, intl, fileinfo
+          coverage: pcov
+          tools: composer:v2
+
+      - name: Get Composer cache directory 📁
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer packages 📦
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-php${{ matrix.php }}-laravel${{ matrix.laravel }}-${{ matrix.stability }}-${{ hashFiles('composer.json') }}
+          restore-keys: |
+            composer-${{ runner.os }}-php${{ matrix.php }}-laravel${{ matrix.laravel }}-
+            composer-${{ runner.os }}-php${{ matrix.php }}-
+
+      - name: Set Laravel & Testbench constraints 🎯
+        run: |
+          composer require \
+            "laravel/framework:${{ matrix.laravel }}" \
+            "orchestra/testbench:${{ matrix.testbench }}" \
+            --no-interaction --no-update
+
+      - name: Install Composer Packages 🎵
+        run: |
+          composer update --${{ matrix.stability }} \
+            --no-ansi --no-interaction --no-progress --prefer-dist --with-all-dependencies
+
+      - name: Prepare Laravel Application 🛠️
+        run: touch database/database.sqlite
+
+      - name: Run Pest Tests with Coverage 🧪
+        run: vendor/bin/pest --coverage --min=100

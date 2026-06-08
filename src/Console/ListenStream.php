@@ -60,13 +60,17 @@ class ListenStream extends Command implements PromptsForMissingInput
         $lastId = '0-0';
 
         $loop->addTimer(
-            $this->option('interval'), fn () => $this->loop(
+            (float) ($this->option('interval') ?? 0), fn () => $this->loop(
                 connection: $connection,
                 lastId: $lastId,
                 loop: $loop,
                 token: $token,
             )
         );
+
+        if (($timeout = $this->option('timeout')) !== null) {
+            $loop->addTimer((float) $timeout, fn () => $loop->stop());
+        }
 
         $loop->run();
     }
@@ -143,7 +147,7 @@ class ListenStream extends Command implements PromptsForMissingInput
     {
         $lastRestart = Cache::get('casey:restart');
 
-        $loop->addPeriodicTimer(5, function () use ($lastRestart, $loop) {
+        $loop->addPeriodicTimer((float) ($this->option('poll') ?? 5), function () use ($lastRestart, $loop) {
             if ($lastRestart === Cache::get('casey:restart')) {
                 return;
             }
@@ -193,6 +197,8 @@ class ListenStream extends Command implements PromptsForMissingInput
             ['token', 't', InputOption::VALUE_OPTIONAL, 'The sha256 hashed personal access token for Casey Jones app'],
             ['connection', 'c', InputOption::VALUE_OPTIONAL, 'The name of the Redis connection to use'],
             ['interval', 'i', InputOption::VALUE_OPTIONAL, 'The interval (in seconds) used to poll for new events'],
+            ['poll', null, InputOption::VALUE_OPTIONAL, 'The interval (in seconds) used to check for the restart signal'],
+            ['timeout', null, InputOption::VALUE_OPTIONAL, 'Stop the listener after this many seconds'],
         ];
     }
 }

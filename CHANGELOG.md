@@ -1,3 +1,9 @@
+# casey-jones
+
+## Historical releases
+
+> Releases below this line were produced by semantic-release. Newer entries are managed by [Changesets](https://github.com/changesets/changesets).
+
 # [1.0.0-beta.10](https://github.com/ActiveEngagement/casey-jones-client/compare/v1.0.0-beta.9...v1.0.0-beta.10) (2024-12-19)
 
 
