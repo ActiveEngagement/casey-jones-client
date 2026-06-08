@@ -127,6 +127,29 @@ Signal all running listeners to restart (e.g. after a deploy):
 php artisan casey:restart
 ```
 
+## TypeScript definitions
+
+The package ships generated TypeScript definitions for its Data objects and enums at
+`resources/types/casey-jones.d.ts`, produced by
+[spatie/typescript-transformer](https://github.com/spatie/typescript-transformer). Types are
+emitted under the `Actengage.CaseyJones` namespace (e.g. `Actengage.CaseyJones.Data.Send`,
+`Actengage.CaseyJones.Enums.SendStatus`).
+
+Reference them from a TypeScript project — for example in `tsconfig.json`:
+
+```jsonc
+{
+  "include": ["vendor/actengage/casey-jones/resources/types/casey-jones.d.ts", "src/**/*"]
+}
+```
+
+The definitions are committed and kept in sync by CI. Regenerate them after changing a Data
+class or enum with:
+
+```bash
+composer types
+```
+
 ## Testing
 
 ```bash

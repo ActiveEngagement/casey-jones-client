@@ -138,3 +138,29 @@ jobs:
       - run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
 
       - run: vendor/bin/rector process --dry-run --no-progress-bar
+
+  typescript:
+    runs-on: ubuntu-latest
+    name: TypeScript Types
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer packages 📦
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: vendor-${{ runner.os }}-php8.4-${{ hashFiles('composer.lock') }}
+
+      - run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
+
+      - name: Regenerate the TypeScript definitions
+        run: composer types
+
+      - name: Ensure the committed definitions are up to date
+        run: git diff --exit-code resources/types/casey-jones.d.ts
