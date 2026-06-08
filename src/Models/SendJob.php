@@ -2,12 +2,12 @@
 
 namespace Actengage\CaseyJones\Models;
 
+use Actengage\CaseyJones\Database\Factories\SendJobFactory;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Database\Eloquent\BroadcastsEvents;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,7 +25,7 @@ use Throwable;
  */
 class SendJob extends Model
 {
-    /** @use HasFactory<Factory<self>> */
+    /** @use HasFactory<SendJobFactory> */
     use BroadcastsEvents, HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
@@ -35,6 +35,28 @@ class SendJob extends Model
         'response',
         'error_message',
     ];
+
+    /**
+     * Get the columns that should receive a unique identifier.
+     *
+     * The primary key stays an auto-incrementing integer; the UUID is stored
+     * in the separate "uuid" column.
+     *
+     * @return array<int, string>
+     */
+    #[\Override]
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory(): SendJobFactory
+    {
+        return SendJobFactory::new();
+    }
 
     /**
      * Get the attributes that should be cast.

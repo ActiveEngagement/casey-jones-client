@@ -1,44 +1,11 @@
 <?php
 
-use Actengage\CaseyJones\Enums\SendStatus;
 use Actengage\CaseyJones\Models\Send;
 use Actengage\CaseyJones\Models\SendJob;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-
-beforeEach(function () {
-    config()->set('database.connections.sqlite.database', ':memory:');
-    DB::purge('sqlite');
-    DB::setDefaultConnection('sqlite');
-
-    Schema::create('sends', function (Blueprint $table) {
-        $table->uuid('id')->primary();
-        $table->string('name')->nullable();
-        $table->string('status')->nullable();
-        $table->json('meta')->nullable();
-        $table->json('data_variables')->nullable();
-        $table->integer('mailingid')->nullable();
-        $table->timestamps();
-        $table->softDeletes();
-    });
-
-    Schema::create('send_jobs', function (Blueprint $table) {
-        $table->uuid('id')->primary();
-        $table->uuid('send_id')->nullable();
-        $table->integer('status_code')->nullable();
-        $table->boolean('failed')->nullable();
-        $table->integer('mailingid')->nullable();
-        $table->json('response')->nullable();
-        $table->text('error_message')->nullable();
-        $table->timestamps();
-        $table->softDeletes();
-    });
-});
 
 it('casts its attributes', function () {
     $job = new SendJob([
@@ -65,28 +32,32 @@ it('broadcasts on itself and its send', function () {
         ->and($channels[0])->toBeInstanceOf(SendJob::class);
 });
 
-describe('query scopes', function () {
-    it('compiles the failed, success and pending scopes', function () {
-        expect(SendJob::failed()->count())->toBe(0)
-            ->and(SendJob::success()->count())->toBe(0)
-            ->and(SendJob::pending()->count())->toBe(0)
-            ->and(SendJob::mailingid(5)->count())->toBe(0);
-    });
+it('assigns a uuid to the uuid column and keeps an auto-incrementing id', function () {
+    $job = SendJob::factory()->create(['status_code' => 200]);
+
+    expect($job->getIncrementing())->toBeTrue()
+        ->and($job->id)->toBeInt()
+        ->and($job->uuid)->toBeString();
 });
 
-it('derives the failed flag from the status code when saving', function () {
-    $success = SendJob::create(['status_code' => 200]);
-    $failure = SendJob::create(['status_code' => 500]);
+it('compiles the no-argument query scopes', function (string $scope) {
+    expect(SendJob::query()->{$scope}()->count())->toBe(0);
+})->with(['failed', 'success', 'pending']);
 
-    expect($success->failed)->toBeFalse()
-        ->and($failure->failed)->toBeTrue();
+it('compiles the mailingid scope', function () {
+    expect(SendJob::mailingid(5)->count())->toBe(0);
 });
+
+it('derives the failed flag from the status code when saving', function (int $statusCode, bool $failed) {
+    expect(SendJob::factory()->create(['status_code' => $statusCode])->failed)->toBe($failed);
+})->with([
+    'success' => [200, false],
+    'server error' => [500, true],
+]);
 
 it('marks the job as failed from a generic exception', function () {
-    $send = Send::create(['name' => 'Test', 'status' => SendStatus::Active, 'mailingid' => 42]);
-    $job = new SendJob(['status_code' => 200]);
-    $job->send_id = $send->id;
-    $job->save();
+    $send = Send::factory()->create(['mailingid' => 42]);
+    $job = SendJob::factory()->create(['send_id' => $send->id, 'status_code' => 200]);
 
     $job->fail(new Exception('something broke'));
 
@@ -96,10 +67,8 @@ it('marks the job as failed from a generic exception', function () {
 });
 
 it('marks the job as failed from a bad response exception', function () {
-    $send = Send::create(['name' => 'Test', 'status' => SendStatus::Active, 'mailingid' => 7]);
-    $job = new SendJob(['status_code' => 200]);
-    $job->send_id = $send->id;
-    $job->save();
+    $send = Send::factory()->create(['mailingid' => 7]);
+    $job = SendJob::factory()->create(['send_id' => $send->id, 'status_code' => 200]);
 
     $exception = new BadResponseException(
         'Unprocessable',

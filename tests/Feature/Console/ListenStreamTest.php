@@ -9,11 +9,13 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Redis;
 use Symfony\Component\Console\Tester\CommandTester;
 
+use function Pest\Laravel\artisan;
+
 it('throws when no token can be resolved', function () {
     config()->set('casey.api_key', null);
 
-    $command = $this->app->make(ListenStream::class);
-    $command->setLaravel($this->app);
+    $command = app(ListenStream::class);
+    $command->setLaravel(app());
 
     (new CommandTester($command))->execute([]);
 })->throws(InvalidArgumentException::class, 'Invalid personal access token');
@@ -34,7 +36,7 @@ it('reads messages, dispatches stream events and stops on the restart signal', f
     // First read snapshots the restart value, the periodic poll then sees it change.
     Cache::shouldReceive('get')->with('casey:restart')->andReturn('a', 'a', 'b');
 
-    $this->artisan('casey:listen', [
+    artisan('casey:listen', [
         '--token' => 'the-token',
         '--interval' => '0',
         '--poll' => '0.02',
@@ -52,7 +54,20 @@ it('hashes the configured api key, handles an empty stream and stops on timeout'
 
     config()->set('casey.api_key', 'app-id|secret-key');
 
-    $this->artisan('casey:listen', [
+    artisan('casey:listen', [
+        '--interval' => '0',
+        '--timeout' => '0.2',
+    ])->assertExitCode(0);
+});
+
+it('returns an empty result when the redis stream is not an array', function () {
+    $connection = Mockery::mock(Connection::class);
+    $connection->shouldReceive('xread')->andReturn(false);
+
+    Redis::shouldReceive('connection')->andReturn($connection);
+
+    artisan('casey:listen', [
+        '--token' => 'the-token',
         '--interval' => '0',
         '--timeout' => '0.2',
     ])->assertExitCode(0);

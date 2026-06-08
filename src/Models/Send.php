@@ -5,6 +5,7 @@ namespace Actengage\CaseyJones\Models;
 use Actengage\CaseyJones\Casts\AsArrayObject;
 use Actengage\CaseyJones\Casts\MessageGearsFolder;
 use Actengage\CaseyJones\Data\MessageGearsFolderData;
+use Actengage\CaseyJones\Database\Factories\SendFactory;
 use Actengage\CaseyJones\Enums\SendStatus;
 use Carbon\Carbon;
 use Illuminate\Broadcasting\Channel;
@@ -14,7 +15,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -34,7 +34,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Send extends Model
 {
-    /** @use HasFactory<Factory<self>> */
+    /** @use HasFactory<SendFactory> */
     use BroadcastsEvents, HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
@@ -64,6 +64,28 @@ class Send extends Model
         'meta' => '{}',
         'data_variables' => '{}',
     ];
+
+    /**
+     * Get the columns that should receive a unique identifier.
+     *
+     * The primary key stays an auto-incrementing integer; the UUID is stored
+     * in the separate "uuid" column.
+     *
+     * @return array<int, string>
+     */
+    #[\Override]
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory(): SendFactory
+    {
+        return SendFactory::new();
+    }
 
     /**
      * Get the attributes that should be cast.

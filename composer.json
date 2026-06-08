@@ -32,7 +32,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Actengage\\CaseyJones\\": "src/"
+            "Actengage\\CaseyJones\\": "src/",
+            "Actengage\\CaseyJones\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {

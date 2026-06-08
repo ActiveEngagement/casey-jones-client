@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\File;
 
+use function Pest\Laravel\artisan;
+
 afterEach(function () {
     foreach ([
         app_path('Listeners/CaseyTestListener.php'),
@@ -14,8 +16,7 @@ afterEach(function () {
 });
 
 it('generates a listener class from the package stub', function () {
-    $this->artisan('casey:listener', ['name' => 'CaseyTestListener'])
-        ->assertExitCode(0);
+    artisan('casey:listener', ['name' => 'CaseyTestListener'])->assertExitCode(0);
 
     $path = app_path('Listeners/CaseyTestListener.php');
 
@@ -28,8 +29,7 @@ it('prefers a published stub when one exists in the application', function () {
     File::ensureDirectoryExists(base_path('stubs'));
     File::put(base_path('stubs/listener.stub'), "<?php\n\nnamespace {{ namespace }};\n\nclass {{ class }}\n{\n    // published stub\n}\n");
 
-    $this->artisan('casey:listener', ['name' => 'CaseyTestListener', '--force' => true])
-        ->assertExitCode(0);
+    artisan('casey:listener', ['name' => 'CaseyTestListener', '--force' => true])->assertExitCode(0);
 
     expect(File::get(app_path('Listeners/CaseyTestListener.php')))->toContain('// published stub');
 });

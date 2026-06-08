@@ -6,40 +6,6 @@ use Actengage\CaseyJones\Models\Send;
 use Carbon\Carbon;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-
-beforeEach(function () {
-    config()->set('database.connections.sqlite.database', ':memory:');
-    DB::purge('sqlite');
-    DB::setDefaultConnection('sqlite');
-
-    Schema::create('sends', function (Blueprint $table) {
-        $table->uuid('id')->primary();
-        $table->integer('instance_id')->nullable();
-        $table->integer('campaign_id')->nullable();
-        $table->string('name')->nullable();
-        $table->string('status')->nullable();
-        $table->json('folder')->nullable();
-        $table->json('data_variables')->nullable();
-        $table->json('meta')->nullable();
-        $table->integer('mailingid')->nullable();
-        $table->timestamp('scheduled_at')->nullable();
-        $table->timestamp('failed_at')->nullable();
-        $table->timestamp('delivered_at')->nullable();
-        $table->timestamps();
-        $table->softDeletes();
-    });
-
-    Schema::create('send_jobs', function (Blueprint $table) {
-        $table->uuid('id')->primary();
-        $table->uuid('send_id')->nullable();
-        $table->integer('status_code')->nullable();
-        $table->timestamps();
-        $table->softDeletes();
-    });
-});
 
 it('casts meta and data_variables to array objects', function () {
     $send = new Send([
@@ -71,13 +37,21 @@ it('returns null from the array object cast when the attribute is missing', func
 });
 
 it('stores null when the folder is set to null', function () {
-    $send = new Send(['folder' => null]);
+    expect((new Send(['folder' => null]))->getAttributes()['folder'])->toBeNull();
+});
 
-    expect($send->getAttributes()['folder'])->toBeNull();
+it('assigns a uuid to the uuid column and keeps an auto-incrementing id', function () {
+    $send = Send::factory()->create();
+
+    expect($send->getKeyName())->toBe('id')
+        ->and($send->getIncrementing())->toBeTrue()
+        ->and($send->id)->toBeInt()
+        ->and($send->uuid)->toBeString()
+        ->and($send->uuid)->toMatch('/^[0-9a-f-]{36}$/');
 });
 
 it('serializes meta arrays through the array object cast', function () {
-    $send = Send::create(['name' => 'Test', 'status' => SendStatus::Active, 'meta' => ['a' => 1]]);
+    $send = Send::factory()->create(['meta' => ['a' => 1]]);
 
     expect($send->fresh()->meta['a'])->toBe(1);
 });
@@ -110,8 +84,7 @@ it('broadcasts on the model and a private channel', function () {
 });
 
 it('nullifies scheduled_at when saved as a draft', function () {
-    $send = Send::create([
-        'name' => 'Test',
+    $send = Send::factory()->create([
         'status' => SendStatus::Draft,
         'scheduled_at' => now(),
     ]);
@@ -120,8 +93,7 @@ it('nullifies scheduled_at when saved as a draft', function () {
 });
 
 it('nullifies failed_at when saved as scheduled', function () {
-    $send = Send::create([
-        'name' => 'Test',
+    $send = Send::factory()->create([
         'status' => SendStatus::Scheduled,
         'scheduled_at' => now(),
         'failed_at' => now(),
@@ -131,28 +103,28 @@ it('nullifies failed_at when saved as scheduled', function () {
         ->and($send->scheduled_at)->not->toBeNull();
 });
 
-describe('query scopes', function () {
-    it('compiles the status scopes', function () {
-        expect(Send::status(SendStatus::Draft, SendStatus::Active)->count())->toBe(0)
-            ->and(Send::draft()->count())->toBe(0)
-            ->and(Send::scheduled()->count())->toBe(0)
-            ->and(Send::active()->count())->toBe(0)
-            ->and(Send::failed()->count())->toBe(0)
-            ->and(Send::queued()->count())->toBe(0);
-    });
+it('compiles the no-argument query scopes', function (string $scope) {
+    expect(Send::query()->{$scope}()->count())->toBe(0);
+})->with([
+    'draft',
+    'scheduled',
+    'active',
+    'failed',
+    'queued',
+    'readyToSend',
+    'activeTooLong',
+]);
 
-    it('compiles the instance and campaign scopes', function () {
-        expect(Send::instance(10)->count())->toBe(0)
-            ->and(Send::query()->campaignId(20)->count())->toBe(0);
-    });
+it('compiles the status scope with explicit statuses', function () {
+    expect(Send::status(SendStatus::Draft, SendStatus::Active)->count())->toBe(0);
+});
 
-    it('compiles the scheduledAt scope from a string and a Carbon instance', function () {
-        expect(Send::scheduledAt('2026-01-01 12:00:00')->count())->toBe(0)
-            ->and(Send::scheduledAt(Carbon::parse('2026-01-01 12:00:00'))->count())->toBe(0);
-    });
+it('compiles the instance and campaign scopes', function () {
+    expect(Send::instance(10)->count())->toBe(0)
+        ->and(Send::query()->campaignId(20)->count())->toBe(0);
+});
 
-    it('compiles the readyToSend and activeTooLong scopes', function () {
-        expect(Send::readyToSend()->count())->toBe(0)
-            ->and(Send::activeTooLong()->count())->toBe(0);
-    });
+it('compiles the scheduledAt scope from a string and a Carbon instance', function () {
+    expect(Send::scheduledAt('2026-01-01 12:00:00')->count())->toBe(0)
+        ->and(Send::scheduledAt(Carbon::parse('2026-01-01 12:00:00'))->count())->toBe(0);
 });
