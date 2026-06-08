@@ -1,21 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Actengage\CaseyJones\Events;
 
 use Actengage\CaseyJones\Redis\Streamable;
 use Actengage\CaseyJones\Redis\StreamPayload;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 class SendScheduled extends Streamable
 {
     /**
      * Create a new event instance.
      *
-     * @return void
+     * @param  array<string, mixed>  $send
      */
     public function __construct(
         public string $token,
@@ -26,8 +23,6 @@ class SendScheduled extends Streamable
 
     /**
      * Define the Redis stream payload.
-     *
-     * @return void
      */
     public function payload(): StreamPayload
     {

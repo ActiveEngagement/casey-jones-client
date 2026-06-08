@@ -21,6 +21,7 @@ class ServiceProvider extends BaseServiceProvider
      *
      * @return void
      */
+    #[\Override]
     public function register()
     {
         $this->mergeConfigFrom(
@@ -29,37 +30,27 @@ class ServiceProvider extends BaseServiceProvider
 
         // Register the API Client.
 
-        $this->app->singleton(Client::class, function() {
-            return new Client(config('casey.api_key'));
-        });
+        $this->app->singleton(Client::class, fn () => new Client($this->configString('casey.api_key')));
 
         $this->app->alias(Client::class, 'casey.client');
 
         // Register the Redis Stream client.
-        
-        $this->app->singleton(Stream::class, function() {
-            return new Stream(
-                Redis::connection(config('casey.redis.connection'))
-            );
-        });
+
+        $this->app->singleton(Stream::class, fn () => new Stream(
+            Redis::connection($this->configString('casey.redis.connection'))
+        ));
 
         $this->app->alias(Stream::class, 'casey.stream');
 
         // Register the MessageGears service provider.
 
-        $this->app->singleton(MessageGears::class, function() {
-            return new MessageGears();
-        });
+        $this->app->singleton(MessageGears::class, fn () => new MessageGears);
 
         $this->app->alias(MessageGears::class, 'casey.mg');
-        
+
         // Register the event listener
 
-        $this->app->singleton(Dispatcher::class, function(Application $app) {
-            return (new Dispatcher($app))->setQueueResolver(function () use ($app) {
-                return $app->make(QueueFactoryContract::class);
-            });
-        });
+        $this->app->singleton(Dispatcher::class, fn (Application $app) => (new Dispatcher($app))->setQueueResolver(fn () => app(QueueFactoryContract::class)));
 
         $this->app->alias(Dispatcher::class, 'casey.events');
     }
@@ -78,16 +69,25 @@ class ServiceProvider extends BaseServiceProvider
         ], 'casey-config');
 
         $this->publishesMigrations([
-            __DIR__.'/../database/migrations' => database_path('migrations')
+            __DIR__.'/../database/migrations' => database_path('migrations'),
         ], 'casey-migrations');
 
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ListenStream::class,
                 MakeListener::class,
-                TerminateStream::class
+                TerminateStream::class,
             ]);
         }
     }
-    
+
+    /**
+     * Get a configuration value as a string.
+     */
+    protected function configString(string $key): ?string
+    {
+        $value = config($key);
+
+        return is_string($value) ? $value : null;
+    }
 }

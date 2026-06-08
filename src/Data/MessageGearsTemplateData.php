@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Actengage\CaseyJones\Data;
 
 use Actengage\CaseyJones\Contracts\Mockable;
@@ -23,18 +25,17 @@ class MessageGearsTemplateData extends Data implements Mockable
         public ?MessageGearsFolderData $folder = null,
         /** @var MessageGearsSampleRecipientData[] */
         #[DataCollectionOf(MessageGearsSampleRecipientData::class)]
-        public ?array $sampleRecipients,
+        public ?array $sampleRecipients = null,
         /** @var MessageGearsSampleRecipientData[] */
         #[DataCollectionOf(MessageGearsTemplateLibraryData::class)]
-        public ?array $templateLibraries,
+        public ?array $templateLibraries = null,
         public bool $locked = false,
     ) {}
 
     /**
      * Mock an instance of the class
      *
-     * @param array $attributes
-     * @return static
+     * @param  array<string, mixed>  $attributes
      */
     public static function mock(array $attributes = []): static
     {

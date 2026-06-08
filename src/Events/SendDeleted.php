@@ -1,14 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Actengage\CaseyJones\Events;
 
 use Actengage\CaseyJones\Redis\Streamable;
 use Actengage\CaseyJones\Redis\StreamPayload;
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -18,6 +15,8 @@ class SendDeleted extends Streamable
 
     /**
      * Create a new event instance.
+     *
+     * @param  array<string, mixed>  $send
      */
     public function __construct(
         public string $token,
@@ -28,8 +27,6 @@ class SendDeleted extends Streamable
 
     /**
      * Define the Redis stream payload.
-     *
-     * @return void
      */
     public function payload(): StreamPayload
     {

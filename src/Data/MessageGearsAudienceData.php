@@ -12,6 +12,9 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 /** @typescript MessageGearsAudience */
 class MessageGearsAudienceData extends Data implements Mockable
 {
+    /**
+     * @param  array<int, MessageGearsSegmentationCriteriaData>|null  $segmentationCriteria
+     */
     public function __construct(
         public int $id,
         public string $name,
@@ -19,36 +22,34 @@ class MessageGearsAudienceData extends Data implements Mockable
         public MessageGearsAudienceDataType $dataType,
         public ?string $sql = null,
         #[DataCollectionOf(MessageGearsSegmentationCriteriaData::class)]
-        /** @var MessageGearsSegmentationCriteriaData[] */
         public ?array $segmentationCriteria = [],
     ) {}
 
     /**
      * Transpose the stored database format into the format used in HTTP requests.
      *
-     * @param array $value
-     * @return array
+     * @param  array<string, mixed>  $value
+     * @return array<int, array{id: int, value: mixed}>
      */
     public function transposeSegmentationCriteria(array $value): array
     {
         $keyedCriteria = collect($this->segmentationCriteria)->keyBy('name');
 
-        return collect($value)->map(function($value, $key) use ($keyedCriteria) {
-            if(!$match = $keyedCriteria->get($key)) {
+        return collect($value)->map(function ($value, $key) use ($keyedCriteria) {
+            if (! $match = $keyedCriteria->get($key)) {
                 throw new MissingSegmentationCriteria(
                     "The key \"{$key}\" is missing from the available segmentation criteria: \"{$keyedCriteria->keys()->implode(', ')}\""
                 );
             }
 
             return ['id' => $match->id, 'value' => $value];
-        })->values()->all();  
+        })->values()->all();
     }
 
     /**
      * Mock an instance of the class
      *
-     * @param array $attributes
-     * @return static
+     * @param  array<string, mixed>  $attributes
      */
     public static function mock(array $attributes = []): static
     {
@@ -58,8 +59,8 @@ class MessageGearsAudienceData extends Data implements Mockable
             'approximateResultCount' => 1,
             'dataType' => MessageGearsAudienceDataType::Audience,
             'segmentationCriteria' => [
-                MessageGearsSegmentationCriteriaData::mock()
-            ]
+                MessageGearsSegmentationCriteriaData::mock(),
+            ],
         ], $attributes));
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Actengage\CaseyJones\Data;
 
 use Actengage\CaseyJones\Contracts\Mockable;
@@ -9,6 +11,9 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 /** @typescript MessageGearsFolderTree */
 class MessageGearsFolderTreeData extends Data implements Mockable
 {
+    /**
+     * @param  array<int, MessageGearsFolderTreeData>  $children
+     */
     public function __construct(
         public int $id,
         public string $path,
@@ -20,8 +25,7 @@ class MessageGearsFolderTreeData extends Data implements Mockable
     /**
      * Mock an instance of the class
      *
-     * @param array $attributes
-     * @return static
+     * @param  array<string, mixed>  $attributes
      */
     public static function mock(array $attributes = []): static
     {
@@ -29,7 +33,7 @@ class MessageGearsFolderTreeData extends Data implements Mockable
             'id' => 1,
             'path' => '/',
             'name' => 'Test Template',
-            'children' => []
+            'children' => [],
         ], $attributes));
     }
 }

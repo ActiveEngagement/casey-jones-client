@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Actengage\CaseyJones\Resources;
 
 use Actengage\CaseyJones\Client;
@@ -9,7 +11,7 @@ use Actengage\CaseyJones\Data\MessageGearsMarketingCampaignData;
 class SendCampaignResource
 {
     use InteractsWithResponses;
-    
+
     public function __construct(
         protected readonly Client $client,
         protected readonly string $send_id
@@ -19,9 +21,6 @@ class SendCampaignResource
 
     /**
      * Show the specified resource.
-     *
-     * @param string $id
-     * @return \Actengage\CaseyJones\Data\MessageGearsMarketingCampaignData
      */
     public function show(): MessageGearsMarketingCampaignData
     {
@@ -31,5 +30,4 @@ class SendCampaignResource
 
         return MessageGearsMarketingCampaignData::from($this->decode($response));
     }
-
 }

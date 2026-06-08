@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Actengage\CaseyJones\Data;
 
 use Actengage\CaseyJones\Contracts\Mockable;
@@ -21,8 +23,7 @@ class MessageGearsCampaignAudienceData extends Data implements Mockable
     /**
      * Mock an instance of the class
      *
-     * @param array $attributes
-     * @return static
+     * @param  array<string, mixed>  $attributes
      */
     public static function mock(array $attributes = []): static
     {
@@ -30,7 +31,7 @@ class MessageGearsCampaignAudienceData extends Data implements Mockable
             'id' => 1,
             'name' => 'Sample Audience',
             'dataProviderType' => MessageGearsAudienceDataProviderType::Query,
-            'dataType' => MessageGearsAudienceDataType::Audience
+            'dataType' => MessageGearsAudienceDataType::Audience,
         ], $attributes));
     }
 }

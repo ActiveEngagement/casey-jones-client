@@ -3,8 +3,8 @@
 use Actengage\CaseyJones\Data\MessageGearsAudienceData;
 use Actengage\CaseyJones\Data\MessageGearsFolderData;
 use Actengage\CaseyJones\Data\MessageGearsTemplateData;
-use Actengage\CaseyJones\Services\MessageGears as MessageGearsService;
 use Actengage\CaseyJones\Facades\MessageGears;
+use Actengage\CaseyJones\Services\MessageGears as MessageGearsService;
 use Actengage\MessageGears\Cloud;
 use Actengage\MessageGears\Facades\Accelerator;
 use GuzzleHttp\Psr7\Response;
@@ -14,6 +14,16 @@ use Illuminate\Support\Collection;
 it('sets the cloud instance fluently', function () {
     expect(MessageGears::cloud(Mockery::mock(Cloud::class)))
         ->toBeInstanceOf(MessageGearsService::class);
+});
+
+it('returns an empty page when the response content is malformed', function () {
+    $service = MessageGears::accelerator(
+        Accelerator::mock([
+            new Response(200, [], json_encode(['content' => 'not-an-array', 'totalElements' => 0, 'size' => 50, 'last' => true])),
+        ])
+    );
+
+    expect($service->getTemplates()->items())->toBe([]);
 });
 
 it('gets a paginated list of templates', function () {

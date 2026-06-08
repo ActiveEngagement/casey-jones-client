@@ -5,8 +5,8 @@ namespace Actengage\CaseyJones\Services;
 use Actengage\CaseyJones\Data\MessageGearsAudienceData;
 use Actengage\CaseyJones\Data\MessageGearsFolderData;
 use Actengage\CaseyJones\Data\MessageGearsFolderTreeData;
-use Actengage\CaseyJones\Data\MessageGearsMarketingCampaignJobStatusData;
 use Actengage\CaseyJones\Data\MessageGearsMarketingCampaignData;
+use Actengage\CaseyJones\Data\MessageGearsMarketingCampaignJobStatusData;
 use Actengage\CaseyJones\Data\MessageGearsMarketingCampaignNewJobData;
 use Actengage\CaseyJones\Data\MessageGearsTemplateData;
 use Actengage\CaseyJones\Enums\MessageGearsJobStatus;
@@ -16,6 +16,8 @@ use Actengage\CaseyJones\Exceptions\JobHasAlreadyBeenCompleted;
 use Actengage\CaseyJones\Exceptions\JobIsCurrentlyBeingCollected;
 use Actengage\MessageGears\Accelerator;
 use Actengage\MessageGears\Cloud;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -25,23 +27,16 @@ class MessageGears
 {
     /**
      * The current accelerator instance.
-     *
-     * @var \Actengage\MessageGears\Cloud
      */
     public Cloud $cloud;
 
     /**
      * The current accelerator instance.
-     *
-     * @var \Actengage\MessageGears\Accelerator
      */
     public Accelerator $accelerator;
 
     /**
      * Set the Cloud instance.
-     *
-     * @param \Actengage\MessageGears\Cloud $instance
-     * @return static
      */
     public function cloud(Cloud $instance): static
     {
@@ -52,9 +47,6 @@ class MessageGears
 
     /**
      * Set the Accelerator instance.
-     *
-     * @param \Actengage\MessageGears\Accelerator $accelerator
-     * @return static
      */
     public function accelerator(Accelerator $instance): static
     {
@@ -66,15 +58,13 @@ class MessageGears
     /**
      * Create the marketing campaign job.
      *
-     * @param integer $campaign_id
-     * @return \Actengage\CaseyJones\Data\MessageGearsMarketingCampaignJobStatusData
-     * @throws \GuzzleHttp\Exception\ClientException
-     * @throws \GuzzleHttp\Exception\ServerException
+     * @throws ClientException
+     * @throws ServerException
      */
     public function createMarketingCampaignJob(int $campaign_id): MessageGearsMarketingCampaignNewJobData
     {
         $response = $this->accelerator->post([
-            'campaign/marketing/%d/job', $campaign_id
+            'campaign/marketing/%d/job', (string) $campaign_id,
         ]);
 
         return MessageGearsMarketingCampaignNewJobData::from(json_decode($response->getBody()));
@@ -83,15 +73,12 @@ class MessageGears
     /**
      * Get the job status.
      *
-     * @param integer $campaign_id
-     * @param integer $mailingid
-     * @return MessageGearsMarketingCampaignJobStatusData
-     * @throws \GuzzleHttp\Exception\ServerException
+     * @throws ServerException
      */
     public function getMarketingCampaignJobStatus(int $campaign_id, int $job_id): MessageGearsMarketingCampaignJobStatusData
     {
         $response = $this->accelerator->get([
-            'campaign/marketing/%d/job/%d', $campaign_id, $job_id
+            'campaign/marketing/%d/job/%d', (string) $campaign_id, (string) $job_id,
         ]);
 
         return MessageGearsMarketingCampaignJobStatusData::from(json_decode($response->getBody()));
@@ -100,38 +87,35 @@ class MessageGears
     /**
      * Check the job status for potential conflicts and throws exceptions.
      *
-     * @param integer $campaign_id
-     * @param integer $mailingid
-     * @return MessageGearsMarketingCampaignJobStatusData
-     * @throws \GuzzleHttp\Exception\ServerException
-     * @throws \Actengage\CaseyJones\Exceptions\JobAlreadyHasDeliveries
-     * @throws \Actengage\CaseyJones\Exceptions\JobAlreadyHasOpens
-     * @throws \Actengage\CaseyJones\Exceptions\JobHasAlreadyBeenCompleted
-     * @throws \Actengage\CaseyJones\Exceptions\JobIsCurrentlyBeingCollected
+     * @throws ServerException
+     * @throws JobAlreadyHasDeliveries
+     * @throws JobAlreadyHasOpens
+     * @throws JobHasAlreadyBeenCompleted
+     * @throws JobIsCurrentlyBeingCollected
      */
     public function checkMarketingCampaignJobStatus(int $campaign_id, int $job_id): MessageGearsMarketingCampaignJobStatusData
     {
         $response = $this->getMarketingCampaignJobStatus($campaign_id, $job_id);
 
-        if($response->jobStatus === MessageGearsJobStatus::Completed) {
+        if ($response->jobStatus === MessageGearsJobStatus::Completed) {
             throw new JobHasAlreadyBeenCompleted(
                 sprintf('The job (%s) has already been completed.', $job_id)
             );
         }
 
-        if($response->jobStatus === MessageGearsJobStatus::Collecting) {
+        if ($response->jobStatus === MessageGearsJobStatus::Collecting) {
             throw new JobIsCurrentlyBeingCollected(
                 sprintf('The job (%s) is currently being collected.', $job_id)
             );
         }
 
-        if($response->deliveryCount) {
+        if ($response->deliveryCount !== 0) {
             throw new JobAlreadyHasDeliveries(
                 sprintf('The job (%s) already has %s deliveries.', $job_id, $response->deliveryCount)
             );
         }
 
-        if($response->openCount) {
+        if ($response->openCount !== 0) {
             throw new JobAlreadyHasOpens(
                 sprintf('The job (%s) already has %s opens.', $job_id, $response->openCount)
             );
@@ -141,40 +125,63 @@ class MessageGears
     }
 
     /**
+     * Decode a paginated API response body into its component parts.
+     *
+     * @return array{content: list<array<array-key, mixed>>, totalElements: int, size: int, last: bool}
+     */
+    protected function decodePage(string $body): array
+    {
+        $data = json_decode($body, true);
+
+        $content = is_array($data) && isset($data['content']) && is_array($data['content'])
+            ? array_values(array_filter($data['content'], is_array(...)))
+            : [];
+
+        return [
+            'content' => $content,
+            'totalElements' => is_array($data) && isset($data['totalElements']) && is_int($data['totalElements']) ? $data['totalElements'] : 0,
+            'size' => is_array($data) && isset($data['size']) && is_int($data['size']) ? $data['size'] : 0,
+            'last' => is_array($data) && isset($data['last']) && is_bool($data['last']) ? $data['last'] : true,
+        ];
+    }
+
+    /**
      * Get a list of template.
      *
-     * @param integer $page
-     * @param integer $limit
-     * @return \Illuminate\Pagination\LengthAwarePaginator<\Actengage\CaseyJones\Data\MessageGearsTemplateData>
-     * @throws \GuzzleHttp\Exception\ServerException
+     * @return LengthAwarePaginator<int, MessageGearsTemplateData>
+     *
+     * @throws ServerException
      */
     public function getTemplates(int $page = 1, int $limit = 50): LengthAwarePaginator
     {
         $response = $this->accelerator->get('template', [
             'query' => [
                 'page' => max(0, $page - 1),
-                'size' => $limit
-            ]
+                'size' => $limit,
+            ],
         ]);
-        
-        $data = json_decode($response->getBody());
 
-        return (new LengthAwarePaginator(
-            $data->content, $data->totalElements, $data->size, $page
-        ))->through(fn (object $data) => MessageGearsTemplateData::from($data));
+        $data = $this->decodePage($response->getBody()->getContents());
+
+        $items = array_map(
+            MessageGearsTemplateData::from(...),
+            $data['content']
+        );
+
+        return new LengthAwarePaginator(
+            $items, $data['totalElements'], $data['size'], $page
+        );
     }
 
     /**
      * Get a template.
      *
-     * @param integer $template_id
-     * @return \Actengage\CaseyJones\Data\MessageGearsTemplateData
-     * @throws \GuzzleHttp\Exception\ServerException
+     * @throws ServerException
      */
     public function getTemplate(int $template_id): MessageGearsTemplateData
     {
         $response = $this->accelerator->get([
-            'template/%s', $template_id
+            'template/%s', (string) $template_id,
         ]);
 
         return MessageGearsTemplateData::from(json_decode($response->getBody()));
@@ -183,15 +190,15 @@ class MessageGears
     /**
      * Creates a template.
      *
-     * @param array $attributes
-     * @return \Actengage\CaseyJones\Data\MessageGearsTemplateData
-     * @throws \GuzzleHttp\Exception\ClientException
-     * @throws \GuzzleHttp\Exception\ServerException
+     * @param  array<string, mixed>  $attributes
+     *
+     * @throws ClientException
+     * @throws ServerException
      */
     public function createTemplate(array $attributes): MessageGearsTemplateData
     {
         $response = $this->accelerator->post('template', [
-            'json' => $attributes
+            'json' => $attributes,
         ]);
 
         return MessageGearsTemplateData::from(json_decode($response->getBody()));
@@ -200,50 +207,45 @@ class MessageGears
     /**
      * Updates a template.
      *
-     * @param int $template_id
-     * @param array $attributes
-     * @return \Actengage\CaseyJones\Data\MessageGearsTemplateData
-     * @throws \GuzzleHttp\Exception\ClientException
-     * @throws \GuzzleHttp\Exception\ServerException
+     * @param  array<string, mixed>  $attributes
+     *
+     * @throws ClientException
+     * @throws ServerException
      */
     public function updateTemplate(int $template_id, array $attributes): MessageGearsTemplateData
     {
-        $response = $this->accelerator->patch([
-            'template/%d', $template_id
+        $response = $this->accelerator->request('patch', [
+            'template/%d', (string) $template_id,
         ], [
-            'json' => $attributes
+            'json' => $attributes,
         ]);
 
-        return MessageGearsTemplateData::from(json_decode($response->getBody()));
+        return MessageGearsTemplateData::from(json_decode((string) $response->getBody()));
     }
 
     /**
      * Deletes a template.
      *
-     * @param int $template_id
-     * @return \GuzzleHttp\Psr7\Response
-     * @throws \GuzzleHttp\Exception\ClientException
-     * @throws \GuzzleHttp\Exception\ServerException
+     * @throws ClientException
+     * @throws ServerException
      */
     public function deleteTemplate(int $template_id): Response
     {
-        return $this->accelerator->delete([
-            'template/%s', $template_id
+        return $this->accelerator->request('delete', [
+            'template/%s', (string) $template_id,
         ]);
     }
 
     /**
      * Get a marketing campaign.
      *
-     * @param integer $campaign_id
-     * @return MessageGearsMarketingCampaignData
-     * @throws \GuzzleHttp\Exception\ClientException
-     * @throws \GuzzleHttp\Exception\ServerException
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getMarketingCampaign(int $campaign_id): MessageGearsMarketingCampaignData
     {
         $response = $this->accelerator->get([
-            'campaign/marketing/%d', $campaign_id
+            'campaign/marketing/%d', (string) $campaign_id,
         ]);
 
         return MessageGearsMarketingCampaignData::from(json_decode($response->getBody()));
@@ -252,34 +254,31 @@ class MessageGears
     /**
      * Update a marketing campaign.
      *
-     * @param integer $campaign_id
-     * @param array $attributes
-     * @return MessageGearsCampaignData
-     * @throws \GuzzleHttp\Exception\ClientException
-     * @throws \GuzzleHttp\Exception\ServerException
+     * @param  array<string, mixed>  $attributes
+     *
+     * @throws ClientException
+     * @throws ServerException
      */
     public function updateMarketingCampaign(int $campaign_id, array $attributes): MessageGearsMarketingCampaignData
     {
-        $response = $this->accelerator->patch([
-            'campaign/marketing/%d', $campaign_id
+        $response = $this->accelerator->request('patch', [
+            'campaign/marketing/%d', (string) $campaign_id,
         ], [
-            'json' => $attributes
+            'json' => $attributes,
         ]);
 
-        return MessageGearsMarketingCampaignData::from(json_decode($response->getBody()));
+        return MessageGearsMarketingCampaignData::from(json_decode((string) $response->getBody()));
     }
 
     /**
      * Get an audience.
      *
-     * @param integer $audience_id
-     * @return MessageGearsAudienceData
-     * @throws \GuzzleHttp\Exception\ClientException
-     * @throws \GuzzleHttp\Exception\ServerException
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getAudience(int $audience_id): MessageGearsAudienceData
     {
-        $response = $this->accelerator->get(['audience/query/%s', $audience_id]);
+        $response = $this->accelerator->get(['audience/query/%s', (string) $audience_id]);
 
         return MessageGearsAudienceData::from(json_decode($response->getBody()));
     }
@@ -287,90 +286,101 @@ class MessageGears
     /**
      * Get a list of paginated folders.
      *
-     * @param int $page
-     * @param int $limit
-     * @return \Illuminate\Pagination\LengthAwarePaginator<\Actengage\CaseyJones\Data\MessageGearsFolderData>
-     * @throws \GuzzleHttp\Exception\ClientException
-     * @throws \GuzzleHttp\Exception\ServerException
+     * @return LengthAwarePaginator<int, MessageGearsFolderData>
+     *
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getFolders(int $page = 1, int $limit = 50): LengthAwarePaginator
     {
         $response = $this->accelerator->get('template/folder', [
             'query' => [
                 'page' => max(0, $page - 1),
-                'size' => $limit
-            ]
+                'size' => $limit,
+            ],
         ]);
 
-        $data = json_decode($response->getBody());
+        $data = $this->decodePage($response->getBody()->getContents());
 
-        return (new LengthAwarePaginator(
-            $data->content, $data->totalElements, $data->size, $page
-        ))->through(fn (object $data) => MessageGearsFolderData::from($data));
+        $items = array_map(
+            MessageGearsFolderData::from(...),
+            $data['content']
+        );
+
+        return new LengthAwarePaginator(
+            $items, $data['totalElements'], $data['size'], $page
+        );
     }
 
     /**
      * Get the all folders.
      *
-     * @return \Illuminate\Support\Collection
-     * @throws \GuzzleHttp\Exception\ClientException
-     * @throws \GuzzleHttp\Exception\ServerException
+     * @return Collection<int, MessageGearsFolderData>
+     *
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getAllFolders(): Collection
     {
-        return Cache::remember("{$this->accelerator->apiKey}-folders", now()->addHour(), function() {
-            $folders = collect();
-            
+        return Cache::remember("{$this->accelerator->apiKey}-folders", now()->addHour(), function (): Collection {
+            $folders = [];
+
             $page = 0;
-            
+
             do {
                 $response = $this->accelerator->get('template/folder', [
                     'query' => [
                         'page' => $page,
-                        'size' => 100
-                    ]
+                        'size' => 100,
+                    ],
                 ]);
 
-                $data = json_decode($response->getBody());
-                            
-                $folders->push(...$data->content);
+                $data = $this->decodePage($response->getBody()->getContents());
+
+                foreach ($data['content'] as $folder) {
+                    $folders[] = MessageGearsFolderData::from($folder);
+                }
 
                 $page++;
-            } while(!$data->last);
+            } while (! $data['last']);
 
-            return MessageGearsFolderData::collect($folders);
+            return collect($folders);
         });
     }
 
     /**
      * Get the folder tree.
      *
-     * @return array
-     * @throws \GuzzleHttp\Exception\ClientException
-     * @throws \GuzzleHttp\Exception\ServerException
+     * @return array<int, MessageGearsFolderTreeData>
+     *
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getFolderTree(): array
     {
-        return Cache::remember("{$this->accelerator->apiKey}-folder-tree", now()->addHour(), function() {
-            $folders = $this->getAllFolders()->map(function ($folder) {
-                return MessageGearsFolderTreeData::from($folder);
-            });
-            
+        return Cache::remember("{$this->accelerator->apiKey}-folder-tree", now()->addHour(), function (): array {
+            $folders = $this->getAllFolders()->map(
+                fn (MessageGearsFolderData $folder): MessageGearsFolderTreeData => MessageGearsFolderTreeData::from($folder)
+            );
+
             $keyed = $folders->keyBy('id');
 
-            foreach($folders as $index => $folder) {
-                if(!isset($folder->parentId)) {
+            foreach ($folders as $index => $folder) {
+                if (! isset($folder->parentId)) {
                     continue;
                 }
 
-                if($parent = $keyed->get($folder->parentId)) {
-                    array_push($parent->children, $folder);
+                $parent = $keyed->get($folder->parentId);
 
+                if ($parent instanceof MessageGearsFolderTreeData) {
+                    $parent->children[] = $folder;
                     $folders->forget($index);
                 }
             }
 
-            return $folders->first()->children;
+            $root = $folders->first();
+
+            return $root instanceof MessageGearsFolderTreeData ? $root->children : [];
         });
     }
 }

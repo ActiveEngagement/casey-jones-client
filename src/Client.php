@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Actengage\CaseyJones;
 
-use Actengage\CaseyJones\Resources\CampaignResource;
-use Actengage\CaseyJones\Resources\SendResource;
 use Actengage\CaseyJones\Concerns\InteractsWithGuzzleClient;
 use Actengage\CaseyJones\Concerns\InteractsWithResponses;
+use Actengage\CaseyJones\Resources\CampaignResource;
 use Actengage\CaseyJones\Resources\InstanceResource;
+use Actengage\CaseyJones\Resources\SendResource;
 use GuzzleHttp\Client as HttpClient;
 
 /**
@@ -18,19 +20,19 @@ class Client
 
     /**
      * Construct a new client.
-     *
-     * @param string|null $key
      */
     public function __construct(
         ?string $key = null
     ) {
-        static::personalAccessToken($key ?? config('casey.api_key'));
+        $apiKey = $key ?? config('casey.api_key');
+
+        static::personalAccessToken(is_string($apiKey) ? $apiKey : null);
     }
 
     /**
      * Get the authenticated app resource.
      *
-     * @return array
+     * @return array<array-key, mixed>
      */
     public function app(): array
     {
@@ -39,8 +41,6 @@ class Client
 
     /**
      * Get all the available instances.
-     *
-     * @return InstanceResource
      */
     public function instances(): InstanceResource
     {
@@ -49,8 +49,6 @@ class Client
 
     /**
      * Search for sends API resource.
-     *
-     * @return SendResource
      */
     public function sends(): SendResource
     {
@@ -59,8 +57,6 @@ class Client
 
     /**
      * Get the campaigns API resource.
-     *
-     * @return CampaignResource
      */
     public function campaigns(): CampaignResource
     {
@@ -69,9 +65,6 @@ class Client
 
     /**
      * Create a new HttpClient with the given access token.
-     *
-     * @param ?string $key
-     * @return HttpClient
      */
     public static function personalAccessToken(?string $key): void
     {
@@ -79,8 +72,8 @@ class Client
             'base_uri' => config('casey.base_uri'),
             'headers' => [
                 'Accept' => 'application/json',
-                'Authorization' => $key ? sprintf('Bearer %s', $key): null
-            ]
+                'Authorization' => $key ? sprintf('Bearer %s', $key) : null,
+            ],
         ]));
     }
 }

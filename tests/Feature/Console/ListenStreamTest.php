@@ -1,19 +1,21 @@
 <?php
 
+use Actengage\CaseyJones\Console\ListenStream;
 use Actengage\CaseyJones\Events\SendCreated;
 use Actengage\CaseyJones\Events\StreamEventReceived;
 use Illuminate\Redis\Connections\Connection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Redis;
+use Symfony\Component\Console\Tester\CommandTester;
 
 it('throws when no token can be resolved', function () {
     config()->set('casey.api_key', null);
 
-    $command = $this->app->make(\Actengage\CaseyJones\Console\ListenStream::class);
+    $command = $this->app->make(ListenStream::class);
     $command->setLaravel($this->app);
 
-    (new \Symfony\Component\Console\Tester\CommandTester($command))->execute([]);
+    (new CommandTester($command))->execute([]);
 })->throws(InvalidArgumentException::class, 'Invalid personal access token');
 
 it('reads messages, dispatches stream events and stops on the restart signal', function () {

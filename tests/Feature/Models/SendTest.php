@@ -3,6 +3,7 @@
 use Actengage\CaseyJones\Data\MessageGearsFolderData;
 use Actengage\CaseyJones\Enums\SendStatus;
 use Actengage\CaseyJones\Models\Send;
+use Carbon\Carbon;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Schema\Blueprint;
@@ -59,11 +60,11 @@ it('casts the folder attribute from data, an array and a json string', function 
     expect((new Send(['folder' => MessageGearsFolderData::mock(['id' => 5])]))->folder->id)->toBe(5)
         ->and((new Send(['folder' => MessageGearsFolderData::mock(['id' => 7])->toArray()]))->folder->id)->toBe(7)
         ->and((new Send(['folder' => MessageGearsFolderData::mock(['id' => 9])->toJson()]))->folder->id)->toBe(9)
-        ->and((new Send())->folder)->toBeNull();
+        ->and((new Send)->folder)->toBeNull();
 });
 
 it('returns null from the array object cast when the attribute is missing', function () {
-    $send = new Send();
+    $send = new Send;
     $send->setRawAttributes(['meta' => null]);
 
     expect($send->meta)->toBeNull();
@@ -88,7 +89,7 @@ it('forces the campaign id to the configured value outside production', function
 });
 
 it('defines the jobs relationship', function () {
-    expect((new Send())->jobs())->toBeInstanceOf(HasMany::class);
+    expect((new Send)->jobs())->toBeInstanceOf(HasMany::class);
 });
 
 it('determines if it is one of the given statuses', function () {
@@ -147,7 +148,7 @@ describe('query scopes', function () {
 
     it('compiles the scheduledAt scope from a string and a Carbon instance', function () {
         expect(Send::scheduledAt('2026-01-01 12:00:00')->count())->toBe(0)
-            ->and(Send::scheduledAt(\Carbon\Carbon::parse('2026-01-01 12:00:00'))->count())->toBe(0);
+            ->and(Send::scheduledAt(Carbon::parse('2026-01-01 12:00:00'))->count())->toBe(0);
     });
 
     it('compiles the readyToSend and activeTooLong scopes', function () {

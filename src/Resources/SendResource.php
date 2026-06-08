@@ -10,7 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class SendResource
 {
     use InteractsWithResponses;
-    
+
     public function __construct(
         protected readonly Client $client
     ) {
@@ -20,14 +20,14 @@ class SendResource
     /**
      * Get a paginated listing of resources.
      *
-     * @param array|null $query
-     * @param array $options
-     * @return \Illuminate\Pagination\LengthAwarePaginator<Actengage\CaseyJones\Data\SendData>
+     * @param  array<string, mixed>|null  $query
+     * @param  array<string, mixed>  $options
+     * @return LengthAwarePaginator<int, SendData>
      */
     public function index(?array $query = null, array $options = []): LengthAwarePaginator
     {
         $response = $this->client->get('sends', [
-            'query' => $query
+            'query' => $query,
         ]);
 
         return $this->paginate($response, $options)->through(
@@ -38,13 +38,12 @@ class SendResource
     /**
      * Create a resource.
      *
-     * @param array $attributes
-     * @return \Actengage\CaseyJones\Data\SendData
+     * @param  array<string, mixed>  $attributes
      */
     public function create(array $attributes): SendData
     {
         $response = $this->client->post('sends', [
-            'json' => $attributes
+            'json' => $attributes,
         ]);
 
         return SendData::from($this->decode($response));
@@ -52,9 +51,6 @@ class SendResource
 
     /**
      * Show the specified resource.
-     *
-     * @param string $send_id
-     * @return \Actengage\CaseyJones\Data\SendData
      */
     public function show(string $send_id): SendData
     {
@@ -66,14 +62,12 @@ class SendResource
     /**
      * Update the specified resource.
      *
-     * @param string $send_id
-     * @param array $attributes
-     * @return \Actengage\CaseyJones\Data\SendData
+     * @param  array<string, mixed>  $attributes
      */
     public function update(string $send_id, array $attributes): SendData
     {
         $response = $this->client->put(sprintf('sends/%s', $send_id), [
-            'json' => $attributes
+            'json' => $attributes,
         ]);
 
         return SendData::from($this->decode($response));
@@ -81,9 +75,6 @@ class SendResource
 
     /**
      * Delete the specified resource.
-     *
-     * @param string $send_id
-     * @return \Actengage\CaseyJones\Data\SendData
      */
     public function delete(string $send_id): SendData
     {
@@ -94,9 +85,6 @@ class SendResource
 
     /**
      * Get the send audience resource.
-     *
-     * @param string $send_id
-     * @return \Actengage\CaseyJones\Resources\SendAudienceResource
      */
     public function audience(string $send_id): SendAudienceResource
     {
@@ -108,9 +96,6 @@ class SendResource
 
     /**
      * Get the send campaign resource.
-     *
-     * @param string $send_id
-     * @return \Actengage\CaseyJones\Resources\SendCampaignResource
      */
     public function campaign(string $send_id): SendCampaignResource
     {
@@ -119,5 +104,4 @@ class SendResource
             send_id: $send_id
         );
     }
-
 }

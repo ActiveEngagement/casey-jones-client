@@ -10,7 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class InstanceTemplateResource
 {
     use InteractsWithResponses;
-    
+
     public function __construct(
         protected readonly Client $client,
         protected readonly int $instance_id
@@ -21,16 +21,16 @@ class InstanceTemplateResource
     /**
      * Get a paginated listing of resources.
      *
-     * @param array|null $query
-     * @param array $options
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * @param  array<string, mixed>|null  $query
+     * @param  array<string, mixed>  $options
+     * @return LengthAwarePaginator<int, MessageGearsTemplateData>
      */
     public function index(?array $query = null, array $options = []): LengthAwarePaginator
     {
         $response = $this->client->get(sprintf(
             'instances/%s/templates', $this->instance_id
         ), [
-            'query' => $query
+            'query' => $query,
         ]);
 
         return $this->paginate($response, $options)->through(
@@ -41,15 +41,14 @@ class InstanceTemplateResource
     /**
      * Create a resource.
      *
-     * @param array $attributes
-     * @return \Actengage\CaseyJones\Data\MessageGearsTemplateData
+     * @param  array<string, mixed>  $attributes
      */
     public function create(array $attributes): MessageGearsTemplateData
     {
         $response = $this->client->post(sprintf(
             'instances/%s/templates', $this->instance_id
         ), [
-            'json' => $attributes
+            'json' => $attributes,
         ]);
 
         return MessageGearsTemplateData::from($this->decode($response));
@@ -57,9 +56,6 @@ class InstanceTemplateResource
 
     /**
      * Show the specified resource.
-     *
-     * @param int $id
-     * @return \Actengage\CaseyJones\Data\MessageGearsTemplateData
      */
     public function show(int $id): MessageGearsTemplateData
     {
@@ -73,15 +69,14 @@ class InstanceTemplateResource
     /**
      * Update a resource.
      *
-     * @param array $attributes
-     * @return \Actengage\CaseyJones\Data\MessageGearsTemplateData
+     * @param  array<string, mixed>  $attributes
      */
     public function update(int $id, array $attributes): MessageGearsTemplateData
     {
         $response = $this->client->put(sprintf(
             'instances/%s/templates/%s', $this->instance_id, $id
         ), [
-            'json' => $attributes
+            'json' => $attributes,
         ]);
 
         return MessageGearsTemplateData::from($this->decode($response));
@@ -89,14 +84,11 @@ class InstanceTemplateResource
 
     /**
      * Delete the specified resource.
-     *
-     * @param int $id
-     * @return void
      */
     public function delete(int $id): void
     {
         $this->client->delete(sprintf(
             'instances/%s/templates/%s', $this->instance_id, $id
         ));
-    }    
+    }
 }

@@ -6,23 +6,31 @@ use ArrayObject;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Casts\Json;
+use Illuminate\Database\Eloquent\Model;
 
 class AsArrayObject implements Castable
 {
     /**
      * Get the caster class to use when casting from / to this cast target.
      *
-     * @param  array  $arguments
-     * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes<\Illuminate\Database\Eloquent\Casts\ArrayObject<array-key, mixed>, iterable>
+     * @param  array<mixed>  $arguments
+     * @return CastsAttributes<ArrayObject<array-key, mixed>, iterable<array-key, mixed>>
      */
     public static function castUsing(array $arguments)
     {
+        /**
+         * @implements CastsAttributes<ArrayObject<array-key, mixed>, iterable<array-key, mixed>>
+         */
         return new class implements CastsAttributes
         {
-            public function get($model, $key, $value, $attributes)
+            /**
+             * @param  array<string, mixed>  $attributes
+             * @return ArrayObject<array-key, mixed>|null
+             */
+            public function get(Model $model, string $key, mixed $value, array $attributes): ?ArrayObject
             {
                 if (! isset($attributes[$key])) {
-                    return;
+                    return null;
                 }
 
                 $data = Json::decode($attributes[$key]);
@@ -30,16 +38,25 @@ class AsArrayObject implements Castable
                 return is_array($data) ? new ArrayObject($data, ArrayObject::ARRAY_AS_PROPS) : null;
             }
 
-            public function set($model, $key, $value, $attributes)
+            /**
+             * @param  array<string, mixed>  $attributes
+             * @return array<string, mixed>
+             */
+            public function set(Model $model, string $key, mixed $value, array $attributes): array
             {
-                if(empty($value)) {
+                if (empty($value)) {
                     $value = (object) [];
                 }
 
                 return [$key => Json::encode($value)];
             }
 
-            public function serialize($model, string $key, $value, array $attributes)
+            /**
+             * @param  ArrayObject<array-key, mixed>  $value
+             * @param  array<string, mixed>  $attributes
+             * @return array<array-key, mixed>|object
+             */
+            public function serialize(Model $model, string $key, mixed $value, array $attributes): array|object
             {
                 return empty($value = $value->getArrayCopy()) ? (object) $value : $value;
             }

@@ -55,11 +55,11 @@ it('casts its attributes', function () {
 });
 
 it('belongs to a send', function () {
-    expect((new SendJob())->send())->toBeInstanceOf(BelongsTo::class);
+    expect((new SendJob)->send())->toBeInstanceOf(BelongsTo::class);
 });
 
 it('broadcasts on itself and its send', function () {
-    $channels = (new SendJob())->broadcastOn('created');
+    $channels = (new SendJob)->broadcastOn('created');
 
     expect($channels)->toHaveCount(2)
         ->and($channels[0])->toBeInstanceOf(SendJob::class);

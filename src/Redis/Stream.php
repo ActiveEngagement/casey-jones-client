@@ -8,8 +8,6 @@ class Stream
 {
     /**
      * Construct the stream dispatch.
-     *
-     * @param Connection $connection
      */
     public function __construct(
         protected Connection $connection
@@ -19,9 +17,6 @@ class Stream
 
     /**
      * Add an event to the redis stream.
-     *
-     * @param StreamPayload $payload
-     * @return string
      */
     public function add(StreamPayload $payload): string
     {
@@ -33,9 +28,7 @@ class Stream
     /**
      * Dispatch an event to the redis stream.
      *
-     * @param string $token
-     * @param string|array<int,string> ...$keys
-     * @return int
+     * @param  string|array<int,string>  ...$keys
      */
     public function delete(string $token, string|array ...$keys): int
     {

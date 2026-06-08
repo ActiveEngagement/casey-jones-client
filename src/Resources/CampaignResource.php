@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Actengage\CaseyJones\Resources;
 
 use Actengage\CaseyJones\Client;
 use Actengage\CaseyJones\Concerns\InteractsWithResponses;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
 
 class CampaignResource
 {
@@ -18,10 +22,10 @@ class CampaignResource
     /**
      * Show the specified resource.
      *
-     * @param int $id
-     * @return array
-     * @throws \GuzzleHttp\Exception\ServerException
-     * @throws \GuzzleHttp\Exception\ClientException
+     * @return array<array-key, mixed>
+     *
+     * @throws ServerException
+     * @throws ClientException
      */
     public function show(int $id): array
     {

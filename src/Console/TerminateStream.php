@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Actengage\CaseyJones\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Redis\Connections\Connection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -37,5 +38,7 @@ class TerminateStream extends Command
         Cache::forever('casey:restart', $this->currentTime());
 
         $this->info('Broadcasting Casey Jones restart signal.');
+
+        return null;
     }
 }

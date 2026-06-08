@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Actengage\CaseyJones\Data;
 
 use Actengage\CaseyJones\Contracts\Mockable;
@@ -20,8 +22,7 @@ class MessageGearsSegmentationCriteriaData extends Data implements Mockable
     /**
      * Mock an instance of the class
      *
-     * @param array $attributes
-     * @return static
+     * @param  array<string, mixed>  $attributes
      */
     public static function mock(array $attributes = []): static
     {
@@ -30,7 +31,7 @@ class MessageGearsSegmentationCriteriaData extends Data implements Mockable
             'name' => 'some_data_variable',
             'label' => 'Some Data Variable',
             'description' => 'This is a mock data variable',
-            'defaultValue' => 'NA'
+            'defaultValue' => 'NA',
         ], $attributes));
     }
 }

@@ -72,3 +72,69 @@ jobs:
 
       - name: Run Pest Tests with Coverage 🧪
         run: vendor/bin/pest --coverage --min=100
+
+  pint:
+    runs-on: ubuntu-latest
+    name: Pint
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer packages 📦
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: vendor-${{ runner.os }}-php8.4-${{ hashFiles('composer.lock') }}
+
+      - run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
+
+      - run: vendor/bin/pint --test
+
+  phpstan:
+    runs-on: ubuntu-latest
+    name: PHPStan
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer packages 📦
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: vendor-${{ runner.os }}-php8.4-${{ hashFiles('composer.lock') }}
+
+      - run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
+
+      - run: vendor/bin/phpstan analyse --no-progress
+
+  rector:
+    runs-on: ubuntu-latest
+    name: Rector
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer packages 📦
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: vendor-${{ runner.os }}-php8.4-${{ hashFiles('composer.lock') }}
+
+      - run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
+
+      - run: vendor/bin/rector process --dry-run --no-progress-bar

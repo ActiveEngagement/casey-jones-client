@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 class InstanceFolderResource
 {
     use InteractsWithResponses;
-    
+
     public function __construct(
         protected readonly Client $client,
         protected readonly int $instance_id
@@ -22,16 +22,16 @@ class InstanceFolderResource
     /**
      * Get a paginated listing of resources.
      *
-     * @param array|null $query
-     * @param array $options
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * @param  array<string, mixed>|null  $query
+     * @param  array<string, mixed>  $options
+     * @return LengthAwarePaginator<int, MessageGearsFolderData>
      */
     public function index(?array $query = null, array $options = []): LengthAwarePaginator
     {
         $response = $this->client->get(sprintf(
             'instances/%s/folders', $this->instance_id
         ), [
-            'query' => $query
+            'query' => $query,
         ]);
 
         return $this->paginate($response, $options)->through(
@@ -42,7 +42,7 @@ class InstanceFolderResource
     /**
      * Get an array of all the resources.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection<int, MessageGearsFolderData>
      */
     public function all(): Collection
     {
@@ -54,9 +54,9 @@ class InstanceFolderResource
     }
 
     /**
-     * Create a resource.
+     * Get the folder tree.
      *
-     * @return array
+     * @return array<array-key, mixed>
      */
     public function tree(): array
     {
@@ -65,5 +65,5 @@ class InstanceFolderResource
         ));
 
         return $this->decode($response);
-    }    
+    }
 }

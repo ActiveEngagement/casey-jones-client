@@ -1,7 +1,7 @@
 <?php
 
 return [
-    
+
     /*
     |--------------------------------------------------------------------------
     | Api Key
@@ -40,6 +40,6 @@ return [
     */
 
     'redis' => [
-        'connection' => env('CASEY_REDIS_CONNECTION', 'casey')
-    ]
+        'connection' => env('CASEY_REDIS_CONNECTION', 'casey'),
+    ],
 ];
