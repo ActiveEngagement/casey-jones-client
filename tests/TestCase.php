@@ -22,7 +22,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
     /**
      * Define the test environment: an in-memory SQLite database shared by all
-     * tests, plus a non-production MessageGears campaign id.
+     * tests.
      *
      * @param  Application  $app
      */
@@ -35,8 +35,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
             'prefix' => '',
             'foreign_key_constraints' => true,
         ]);
-
-        $app['config']->set('services.mg.campaign_id', 1);
     }
 
     /**

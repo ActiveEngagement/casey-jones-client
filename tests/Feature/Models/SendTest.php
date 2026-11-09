@@ -56,10 +56,8 @@ it('serializes meta arrays through the array object cast', function () {
     expect($send->fresh()->meta['a'])->toBe(1);
 });
 
-it('forces the campaign id to the configured value outside production', function () {
-    config()->set('services.mg.campaign_id', 99);
-
-    expect((new Send(['campaign_id' => 12345]))->campaign_id)->toBe(99);
+it('keeps the given campaign id in every environment', function () {
+    expect((new Send(['campaign_id' => 12345]))->campaign_id)->toBe(12345);
 });
 
 it('defines the jobs relationship', function () {

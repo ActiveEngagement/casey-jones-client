@@ -13,7 +13,6 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Database\Eloquent\BroadcastsEvents;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -114,20 +113,6 @@ class Send extends Model
     public function jobs(): HasMany
     {
         return $this->hasMany(SendJob::class);
-    }
-
-    /**
-     * Get and set the campaign id. This prevents using anything but the test
-     * campaign for environments other than production.
-     *
-     * @return Attribute<int|null, int|null>
-     */
-    protected function campaignId(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => app()->environment('production') ? $value : config('services.mg.campaign_id'),
-            set: fn ($value) => app()->environment('production') ? $value : config('services.mg.campaign_id'),
-        );
     }
 
     /**
