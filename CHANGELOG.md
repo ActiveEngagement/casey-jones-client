@@ -1,5 +1,13 @@
 # casey-jones
 
+## 3.0.0
+
+### Major Changes
+
+- [#4](https://github.com/ActiveEngagement/casey-jones-client/pull/4) [`26643f9`](https://github.com/ActiveEngagement/casey-jones-client/commit/26643f9656b91cbfd12ebe1b9f6b0101654f5653) Thanks [@josephkerkhof](https://github.com/josephkerkhof)! - Remove the non-production `campaign_id` override from `Send`. The model now returns and stores its own `campaign_id` in every environment, and no longer reads `services.mg.campaign_id`. Apps that relied on the override to force a test campaign outside production must make sure their non-production data uses test campaigns.
+
+  `MessageGearsMarketingCampaignJobStatusData::mock()` no longer reads `services.mg.accelerator_account_id`. Its account ID is `1`. Pass `account` to `mock()` to set a different one.
+
 ## 2.0.0
 
 ### Major Changes
