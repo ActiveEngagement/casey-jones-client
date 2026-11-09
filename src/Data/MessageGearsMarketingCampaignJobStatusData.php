@@ -54,7 +54,7 @@ class MessageGearsMarketingCampaignJobStatusData extends Data implements Mockabl
             'jobStatus' => MessageGearsJobStatus::Completed,
             'jobActivityStatus' => MessageGearsJobActivityStatus::Complete,
             'account' => MessageGearsAccountData::from([
-                'id' => config('services.mg.accelerator_account_id', 1),
+                'id' => 1,
                 'name' => 'Active Engagement Accelerator',
             ]),
             'category' => 'AE',
